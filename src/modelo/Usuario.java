@@ -13,8 +13,9 @@ public class Usuario {
 private int idUsuario;
     private String nombre;
     private String usuario;
-    private String contrasena; // Solo para el DAO, no exponer
+    private String contrasena;
     private int idRol;
+    private String rolNombre;
     
     // (Constructor vacío)
     public Usuario() {}
@@ -30,4 +31,6 @@ private int idUsuario;
     public void setContrasena(String contrasena) { this.contrasena = contrasena; }
     public int getIdRol() { return idRol; }
     public void setIdRol(int idRol) { this.idRol = idRol; }
+    public String getRolNombre() { return rolNombre; }
+    public void setRolNombre(String rolNombre) { this.rolNombre = rolNombre; }
 }

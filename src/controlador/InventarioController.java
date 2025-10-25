@@ -9,6 +9,7 @@ import java.util.List;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 import modelo.Producto;
+import modelo.Usuario;
 import vista.InventarioPanel;
 
 /**
@@ -20,14 +21,16 @@ public class InventarioController {
     private final InventarioPanel vista;
     private final IProductoDAO dao;
     private final DefaultTableModel modeloTabla;
+    private final Usuario usuario;
 
-    public InventarioController(InventarioPanel vista, IProductoDAO dao) {
-        this.vista = vista;
-        this.dao = dao;
-        this.modeloTabla = vista.getModeloTabla();
-        
-        inicializar();
-    }
+    public InventarioController(InventarioPanel vista, IProductoDAO dao, Usuario usuario) {
+    this.vista = vista;
+    this.dao = dao;
+    this.usuario = usuario; // <-- AÑADIR ESTA LÍNEA
+    this.modeloTabla = vista.getModeloTabla();
+
+    inicializar();
+}
     
     private void inicializar() {
     // 1. Carga inicial
@@ -42,8 +45,15 @@ public class InventarioController {
 
     vista.getChkStockBajo().addActionListener(e -> cargarDatosTabla());
 
-    // 3. Listener para el botón Eliminar
-    vista.getBtnEliminar().addActionListener(e -> eliminarProductoSeleccionado());
+    // 3. Permisos de Administrador
+    if (usuario.getRolNombre().equals("Administrador")) {
+        // Solo el Admin ve y usa el botón eliminar
+        vista.getBtnEliminar().setVisible(true);
+        vista.getBtnEliminar().addActionListener(e -> eliminarProductoSeleccionado());
+    } else {
+        // Oculta el botón para otros roles
+        vista.getBtnEliminar().setVisible(false);
+    }
 
     // 4. (Próximo paso) Listener para Doble-Clic (Editar)
     // vista.getTablaProductos().addMouseListener(...)

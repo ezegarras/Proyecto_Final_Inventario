@@ -38,11 +38,11 @@ public class DashboardWindow extends JFrame {
     private JButton btnNavInventario;
     private JButton btnNavEntradas;
     private JButton btnNavSalidas;
-    // (Añadiremos más botones de menú luego)
-    
+    private Usuario usuario;
     private CardLayout cardLayout; 
 
     public DashboardWindow(Usuario usuario) {
+        this.usuario = usuario;
         initializeComponents(usuario);
         setupLayout();
         configureWindow();
@@ -105,8 +105,7 @@ public class DashboardWindow extends JFrame {
         // Crear e instanciar el módulo de Inventario
         vista.InventarioPanel panelInventario = new vista.InventarioPanel();
         dao.IProductoDAO productoDAO = new dao.ProductoDAOImpl();
-        new controlador.InventarioController(panelInventario, productoDAO);
-        // Añadirlo al CardLayout
+        new controlador.InventarioController(panelInventario, productoDAO, usuario);        // Añadirlo al CardLayout
         panelContent.add(panelInventario, "inventario");
         
         // -------------------------

@@ -42,8 +42,9 @@ public class InventarioPanel extends JPanel {
 
         // 3. Inicializar Componentes
         chkStockBajo = new JCheckBox("Productos con stock bajo");
-    btnEliminar = StyleManager.createPrimaryButton("Eliminar Producto");
-    btnEliminar.setBackground(new java.awt.Color(211, 47, 47));
+        btnEliminar = StyleManager.createPrimaryButton("Eliminar Producto");
+        btnEliminar.setBackground(new java.awt.Color(211, 47, 47));
+        btnEliminar.setVisible(false);
         JLabel lblTitulo = StyleManager.createLabel("Gestión de Productos");
         lblTitulo.setFont(StyleManager.FONT_TITULO);
         

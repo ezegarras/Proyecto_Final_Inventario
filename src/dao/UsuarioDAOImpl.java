@@ -20,9 +20,11 @@ public class UsuarioDAOImpl implements IUsuarioDAO {
     @Override
     public Usuario login(String usuario, String contrasena) {
         Usuario user = null;
-        // ATENCIÓN: Esta consulta compara contraseñas en texto plano.
-        // ¡Debemos cambiar esto por un HASH (ej. SHA-256) en el futuro!
-        String sql = "SELECT * FROM Usuario WHERE usuario = ? AND contrasena = ?";
+
+        String sql = "SELECT u.*, r.nombre as rol_nombre " +
+             "FROM Usuario u " +
+             "JOIN Rol r ON u.id_rol = r.id_rol " +
+             "WHERE u.usuario = ? AND u.contrasena = ?";
         
         try (Connection con = ConexionBD.getConexion();
              PreparedStatement ps = con.prepareStatement(sql)) {
@@ -37,6 +39,7 @@ public class UsuarioDAOImpl implements IUsuarioDAO {
                     user.setNombre(rs.getString("nombre"));
                     user.setUsuario(rs.getString("usuario"));
                     user.setIdRol(rs.getInt("id_rol"));
+                    user.setRolNombre(rs.getString("rol_nombre"));
                 }
             }
             

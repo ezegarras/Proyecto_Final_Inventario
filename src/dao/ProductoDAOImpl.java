@@ -20,6 +20,40 @@ import utils.ConexionBD;
  */
 
 public class ProductoDAOImpl implements IProductoDAO {
+    
+    @Override
+    public int insertar(Producto producto) {
+        String sql = "INSERT INTO Producto (nombre, precio_unitario, stock_actual, " +
+                     "stock_minimo, id_categoria) VALUES (?, ?, ?, ?, ?)";
+        
+        // Usamos Statement.RETURN_GENERATED_KEYS para obtener el ID
+        try (Connection con = ConexionBD.getConexion();
+             PreparedStatement ps = con.prepareStatement(sql, 
+                                     java.sql.Statement.RETURN_GENERATED_KEYS)) {
+            
+            ps.setString(1, producto.getNombre());
+            ps.setDouble(2, producto.getPrecioUnitario());
+            ps.setInt(3, producto.getStockActual());
+            ps.setInt(4, producto.getStockMinimo());
+            ps.setInt(5, producto.getIdCategoria());
+            
+            int filasAfectadas = ps.executeUpdate();
+            
+            if (filasAfectadas > 0) {
+                // Obtenemos el ID generado
+                try (ResultSet rs = ps.getGeneratedKeys()) {
+                    if (rs.next()) {
+                        return rs.getInt(1); // Devuelve el ID
+                    }
+                }
+            }
+            return -1; // Falló la inserción
+            
+        } catch (SQLException e) {
+            System.err.println("Error al insertar producto: " + e.getMessage());
+            return -1;
+        }
+    }
 
 @Override
 public List<Producto> listarProductos(String busqueda, boolean soloStockBajo) {
@@ -80,6 +114,63 @@ public List<Producto> listarProductos(String busqueda, boolean soloStockBajo) {
     }
     return productos;
 }
+
+@Override
+    public Producto buscarPorId(int idProducto) {
+        Producto p = null;
+        // Obtenemos el producto CON el nombre de su categoría
+        String sql = "SELECT p.*, c.nombre AS nombre_categoria " +
+                     "FROM Producto p " +
+                     "JOIN Categoria c ON p.id_categoria = c.id_categoria " +
+                     "WHERE p.id_producto = ?";
+        
+        try (Connection con = ConexionBD.getConexion();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            
+            ps.setInt(1, idProducto);
+            
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    p = new Producto();
+                    p.setIdProducto(rs.getInt("id_producto"));
+                    p.setNombre(rs.getString("nombre"));
+                    p.setPrecioUnitario(rs.getDouble("precio_unitario"));
+                    p.setStockActual(rs.getInt("stock_actual"));
+                    p.setStockMinimo(rs.getInt("stock_minimo"));
+                    p.setIdCategoria(rs.getInt("id_categoria"));
+                    p.setNombreCategoria(rs.getString("nombre_categoria"));
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Error al buscar producto por ID: " + e.getMessage());
+        }
+        return p;
+    }
+
+    @Override
+    public boolean actualizar(Producto producto) {
+        String sql = "UPDATE Producto SET nombre = ?, precio_unitario = ?, " +
+                     "stock_actual = ?, stock_minimo = ?, id_categoria = ? " +
+                     "WHERE id_producto = ?";
+        
+        try (Connection con = ConexionBD.getConexion();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            
+            ps.setString(1, producto.getNombre());
+            ps.setDouble(2, producto.getPrecioUnitario());
+            ps.setInt(3, producto.getStockActual());
+            ps.setInt(4, producto.getStockMinimo());
+            ps.setInt(5, producto.getIdCategoria());
+            ps.setInt(6, producto.getIdProducto());
+            
+            int filasAfectadas = ps.executeUpdate();
+            return filasAfectadas > 0;
+            
+        } catch (SQLException e) {
+            System.err.println("Error al actualizar producto: " + e.getMessage());
+            return false;
+        }
+    }
 
 @Override
 public boolean eliminar(int idProducto) {

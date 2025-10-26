@@ -4,6 +4,7 @@
  */
 package controlador;
 
+import dao.ICategoriaDAO;
 import dao.IProductoDAO;
 import java.util.List;
 import javax.swing.JOptionPane;
@@ -11,6 +12,8 @@ import javax.swing.table.DefaultTableModel;
 import modelo.Producto;
 import modelo.Usuario;
 import vista.InventarioPanel;
+import javax.swing.SwingUtilities;
+import vista.ProductoDialog;
 
 /**
  *
@@ -20,13 +23,15 @@ public class InventarioController {
     
     private final InventarioPanel vista;
     private final IProductoDAO dao;
+    private final ICategoriaDAO categoriaDAO;
     private final DefaultTableModel modeloTabla;
     private final Usuario usuario;
 
     public InventarioController(InventarioPanel vista, IProductoDAO dao, Usuario usuario) {
     this.vista = vista;
     this.dao = dao;
-    this.usuario = usuario; // <-- AÑADIR ESTA LÍNEA
+    this.categoriaDAO = new dao.CategoriaDAOImpl();
+    this.usuario = usuario; 
     this.modeloTabla = vista.getModeloTabla();
 
     inicializar();
@@ -50,6 +55,16 @@ public class InventarioController {
         // Solo el Admin ve y usa el botón eliminar
         vista.getBtnEliminar().setVisible(true);
         vista.getBtnEliminar().addActionListener(e -> eliminarProductoSeleccionado());
+        vista.getTablaProductos().addMouseListener(new java.awt.event.MouseAdapter() {
+            
+    @Override
+    public void mouseClicked(java.awt.event.MouseEvent evt) {
+        if (evt.getClickCount() == 2) {
+            abrirDialogoEditar();
+        }
+    }
+});
+   
     } else {
         // Oculta el botón para otros roles
         vista.getBtnEliminar().setVisible(false);
@@ -116,4 +131,37 @@ public class InventarioController {
         // (Si hay error, el DAO ya mostró un mensaje)
     }
 }
+
+private void abrirDialogoEditar() {
+    // 1. Obtener la fila seleccionada
+    int filaSeleccionada = vista.getTablaProductos().getSelectedRow();
+    if (filaSeleccionada == -1) {
+        return; // No hay fila seleccionada
+    }
+
+    // 2. Obtener el ID del producto de la tabla (columna 0)
+    int idProducto = (int) modeloTabla.getValueAt(filaSeleccionada, 0);
+
+    // 3. Buscar el producto en la BD
+    Producto productoAEditar = dao.buscarPorId(idProducto);
+
+    if (productoAEditar == null) {
+        JOptionPane.showMessageDialog(vista, "No se pudo encontrar el producto.", "Error", JOptionPane.ERROR_MESSAGE);
+        return;
+    }
+
+    // 4. Crear la vista (Diálogo)
+    java.awt.Frame framePadre = (java.awt.Frame) SwingUtilities.getWindowAncestor(vista);
+    ProductoDialog dialogView = new ProductoDialog(framePadre);
+
+    // 5. Crear el controlador del diálogo
+    new ProductoDialogController(dialogView, dao, categoriaDAO, productoAEditar);
+
+    // 6. Mostrar el diálogo
+    dialogView.setVisible(true);
+
+    // 7. (Importante) Cuando el diálogo se cierra, recargamos la tabla
+    cargarDatosTabla();
+}
+    
 }

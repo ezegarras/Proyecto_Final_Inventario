@@ -28,5 +28,15 @@ public interface IProductoDAO {
      */
     boolean eliminar(int idProducto);
     
-    // (Aquí irán buscarPorId y actualizar para el 'Editar')
+   
+    Producto buscarPorId(int idProducto);
+    boolean actualizar(Producto producto);
+    
+    /**
+     * Inserta un nuevo producto en la BD.
+     * Devuelve el ID generado.
+     * @param producto El producto a insertar (sin ID).
+     * @return El ID autogenerado del nuevo producto, o -1 si falla.
+     */
+    int insertar(Producto producto);
 }

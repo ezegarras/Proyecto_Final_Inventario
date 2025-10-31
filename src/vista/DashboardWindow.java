@@ -23,6 +23,10 @@ import modelo.Usuario;
 import utils.StyleManager;
 import javax.swing.BorderFactory;
 import java.awt.Dimension;
+import dao.IEntradaDAO;
+import dao.IProveedorDAO;
+import dao.EntradaDAOImpl;
+import dao.ProveedorDAOImpl;
 
 public class DashboardWindow extends JFrame {
 
@@ -111,10 +115,25 @@ public class DashboardWindow extends JFrame {
         // -------------------------
         // (Aquí añadiremos los otros paneles: "inventario", "entradas", etc.)
         
+        // Crear e instanciar el módulo de Entradas
+        vista.EntradasPanel panelEntradas = new vista.EntradasPanel();
+        dao.IEntradaDAO entradaDAO = new dao.EntradaDAOImpl();
+        dao.IProveedorDAO proveedorDAO = new dao.ProveedorDAOImpl();
+        dao.ICategoriaDAO categoriaDAO = new dao.CategoriaDAOImpl();
+        
+        new controlador.EntradasController(panelEntradas, entradaDAO, productoDAO, proveedorDAO, categoriaDAO);
+
+        // Añadirlo al CardLayout
+        panelContent.add(panelEntradas, "entradas");
+        // -------------------------
+        
         add(panelContent, BorderLayout.CENTER);
         
         // Mostramos 'home' por defecto
         cardLayout.show(panelContent, "home");
+        
+        
+        
     }
 
     private void configureWindow() {

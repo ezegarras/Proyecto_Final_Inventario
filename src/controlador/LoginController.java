@@ -46,18 +46,18 @@ private final LoginWindow vista;
         Usuario usuario = dao.login(user, pass);
         
         if (usuario != null) {  
-            // ¡Login Exitoso!
-            // 1. Crea la nueva Vista (Dashboard)
+           
+            // (Dashboard)
             DashboardWindow dashboardView = new DashboardWindow(usuario);
             
             // 2. Crea el Controlador del Dashboard
             new DashboardController(dashboardView, usuario);
             
-            // 3. Usa el NavigationManager para cambiar de ventana
+            // 3.
             NavigationManager.navigateTo(vista, dashboardView);
             
         } else {
-            // Error
+            
             JOptionPane.showMessageDialog(vista, "Usuario o contraseña incorrectos.", "Error", JOptionPane.ERROR_MESSAGE);
         }
     }

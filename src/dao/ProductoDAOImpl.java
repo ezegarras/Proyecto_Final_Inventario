@@ -26,7 +26,7 @@ public class ProductoDAOImpl implements IProductoDAO {
         String sql = "INSERT INTO Producto (nombre, precio_unitario, stock_actual, " +
                      "stock_minimo, id_categoria) VALUES (?, ?, ?, ?, ?)";
         
-        // Usamos Statement.RETURN_GENERATED_KEYS para obtener el ID
+       
         try (Connection con = ConexionBD.getConexion();
              PreparedStatement ps = con.prepareStatement(sql, 
                                      java.sql.Statement.RETURN_GENERATED_KEYS)) {
@@ -47,7 +47,7 @@ public class ProductoDAOImpl implements IProductoDAO {
                     }
                 }
             }
-            return -1; // Falló la inserción
+            return -1;
             
         } catch (SQLException e) {
             System.err.println("Error al insertar producto: " + e.getMessage());
@@ -59,16 +59,16 @@ public class ProductoDAOImpl implements IProductoDAO {
 public List<Producto> listarProductos(String busqueda, boolean soloStockBajo) {
     List<Producto> productos = new ArrayList<>();
 
-    // 1. Construimos una consulta SQL dinámica
+    // Construimos una consulta SQL dinámica
     StringBuilder sql = new StringBuilder(
         "SELECT p.*, c.nombre AS nombre_categoria " +
         "FROM Producto p " +
         "JOIN Categoria c ON p.id_categoria = c.id_categoria "
     );
 
-    List<Object> params = new ArrayList<>(); // Lista para los parámetros
+    List<Object> params = new ArrayList<>(); 
 
-    // Añadir filtros (WHERE)
+    
     boolean hasWhere = false;
 
     if (busqueda != null && !busqueda.trim().isEmpty()) {
@@ -87,7 +87,7 @@ public List<Producto> listarProductos(String busqueda, boolean soloStockBajo) {
 
     sql.append(" ORDER BY p.id_producto");
 
-    // 2. Ejecutar la consulta
+    
     try (Connection con = ConexionBD.getConexion();
          PreparedStatement ps = con.prepareStatement(sql.toString())) {
 
@@ -118,7 +118,7 @@ public List<Producto> listarProductos(String busqueda, boolean soloStockBajo) {
 @Override
     public Producto buscarPorId(int idProducto) {
         Producto p = null;
-        // Obtenemos el producto CON el nombre de su categoría
+        
         String sql = "SELECT p.*, c.nombre AS nombre_categoria " +
                      "FROM Producto p " +
                      "JOIN Categoria c ON p.id_categoria = c.id_categoria " +

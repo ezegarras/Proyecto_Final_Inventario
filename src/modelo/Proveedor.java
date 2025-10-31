@@ -8,6 +8,7 @@ package modelo;
  *
  * @author Enrique Zegarra
  */
+
 public class Proveedor {
     private int idProveedor;
     private String razonSocial;
@@ -30,7 +31,6 @@ public class Proveedor {
     public String getDireccion() { return direccion; }
     public void setDireccion(String direccion) { this.direccion = direccion; }
 
-    // --- IMPORTANTE ---
     // Sobrescribimos toString() para que el JComboBox muestre un nombre legible
     @Override
     public String toString() {

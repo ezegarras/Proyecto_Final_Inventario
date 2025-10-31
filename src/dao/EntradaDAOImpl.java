@@ -28,10 +28,10 @@ public class EntradaDAOImpl implements IEntradaDAO {
         
         try {
             con = ConexionBD.getConexion();
-            // --- INICIO DE LA TRANSACCIÓN ---
+           
             con.setAutoCommit(false); 
             
-            // 1. Insertar en la tabla Entrada
+            // Insertar en la tabla Entrada
             try (PreparedStatement psEntrada = con.prepareStatement(sqlInsertarEntrada)) {
                 psEntrada.setDate(1, new java.sql.Date(entrada.getFecha().getTime()));
                 psEntrada.setInt(2, entrada.getCantidad());
@@ -40,20 +40,20 @@ public class EntradaDAOImpl implements IEntradaDAO {
                 psEntrada.executeUpdate();
             }
             
-            // 2. Actualizar el stock en la tabla Producto
+            //  Actualizar el stock en la tabla Producto
             try (PreparedStatement psStock = con.prepareStatement(sqlActualizarStock)) {
                 psStock.setInt(1, entrada.getCantidad());
                 psStock.setInt(2, entrada.getIdProducto());
                 psStock.executeUpdate();
             }
             
-            // 3. Si todo salió bien, confirmar la transacción
+            //
             con.commit();
             return true;
             
         } catch (SQLException e) {
             System.err.println("Error en la transacción de entrada: " + e.getMessage());
-            // 4. Si algo falló, revertir todo
+            
             try {
                 if (con != null) {
                     con.rollback();
@@ -63,11 +63,11 @@ public class EntradaDAOImpl implements IEntradaDAO {
             }
             return false;
         } finally {
-            // 5. Devolver la conexión al modo AutoCommit y cerrarla
+            
             try {
                 if (con != null) {
                     con.setAutoCommit(true);
-                    con.close(); // Cerramos la conexión manualmente (ya no usamos try-with-resources)
+                    con.close(); 
                 }
             } catch (SQLException e) {
                 System.err.println("Error al restaurar auto-commit: " + e.getMessage());

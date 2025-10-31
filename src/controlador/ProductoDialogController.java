@@ -22,53 +22,75 @@ public class ProductoDialogController {
     private final ProductoDialog vista;
     private final IProductoDAO productoDAO;
     private final ICategoriaDAO categoriaDAO;
-    private final Producto producto; // El producto que estamos editando
+    private final Producto producto;
+    private final boolean modoEdicion;
 
-    public ProductoDialogController(ProductoDialog vista, IProductoDAO pDAO, ICategoriaDAO cDAO, Producto producto) {
+    public ProductoDialogController(ProductoDialog vista, IProductoDAO pDAO, ICategoriaDAO cDAO, Producto producto, boolean modoEdicion) {
         this.vista = vista;
         this.productoDAO = pDAO;
         this.categoriaDAO = cDAO;
         this.producto = producto;
+        this.modoEdicion = modoEdicion;
         
-        // 1. Cargar datos en la vista
+        //  Cargar datos en la vista
         cargarDatos();
         
-        // 2. Asignar listeners
+        // Asignar listeners
         this.vista.getBtnGuardar().addActionListener(e -> guardarCambios());
         this.vista.getBtnCancelar().addActionListener(e -> vista.dispose());
     }
     
     private void cargarDatos() {
-        // 1. Cargar la lista de categorías en el JComboBox
-        List<Categoria> categorias = categoriaDAO.listarTodas();
-        vista.setCategorias(categorias);
-        
-        // 2. Llenar el formulario con los datos del producto
+    // Cargar la lista de categorías
+    List<Categoria> categorias = categoriaDAO.listarTodas();
+    vista.setCategorias(categorias);
+
+    // Llenar el formulario 
+    if (modoEdicion) {
         vista.setProducto(producto);
+        vista.setTitle("Editar Producto"); 
+    } else {
+        vista.setTitle("Crear Nuevo Producto"); 
     }
+}
     
     private void guardarCambios() {
         try {
-            // 1. Validar precio (simple)
+           
             double precio = Double.parseDouble(vista.getTxtPrecio().getText());
             if (precio < 0) {
                 JOptionPane.showMessageDialog(vista, "El precio no puede ser negativo.", "Error de Validación", JOptionPane.ERROR_MESSAGE);
                 return;
             }
             
-            // 2. Obtener el objeto Producto actualizado desde la vista
-            Producto productoActualizado = vista.getProductoActualizado(this.producto);
             
-            // 3. Llamar al DAO para guardar
-            boolean exito = productoDAO.actualizar(productoActualizado);
+            Producto productoDatos = vista.getProductoActualizado(this.producto);
+            boolean exito = false;
             
+            
+            if (modoEdicion) {
+           
+            exito = productoDAO.actualizar(productoDatos);
+
             if (exito) {
                 JOptionPane.showMessageDialog(vista, "Producto actualizado exitosamente.");
-                vista.dispose(); // Cierra el diálogo
+                vista.dispose(); 
             } else {
                 JOptionPane.showMessageDialog(vista, "Error al actualizar el producto.", "Error", JOptionPane.ERROR_MESSAGE);
             }
-            
+
+        } else {
+  
+            int nuevoId = productoDAO.insertar(productoDatos);
+            exito = (nuevoId > 0);
+
+            if (exito) {
+                JOptionPane.showMessageDialog(vista, "Producto creado exitosamente.");
+                vista.dispose(); 
+            } else {
+                JOptionPane.showMessageDialog(vista, "Error al crear el producto.", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        } 
         } catch (NumberFormatException e) {
             JOptionPane.showMessageDialog(vista, "El formato del precio es incorrecto.", "Error de Validación", JOptionPane.ERROR_MESSAGE);
         }

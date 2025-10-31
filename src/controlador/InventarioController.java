@@ -38,10 +38,10 @@ public class InventarioController {
 }
     
     private void inicializar() {
-    // 1. Carga inicial
+ 
     cargarDatosTabla();
 
-    // 2. Listeners para los filtros (se actualizan en vivo)
+  
     vista.getTxtBuscarProducto().getDocument().addDocumentListener(new javax.swing.event.DocumentListener() {
         @Override public void insertUpdate(javax.swing.event.DocumentEvent e) { cargarDatosTabla(); }
         @Override public void removeUpdate(javax.swing.event.DocumentEvent e) { cargarDatosTabla(); }
@@ -50,7 +50,7 @@ public class InventarioController {
 
     vista.getChkStockBajo().addActionListener(e -> cargarDatosTabla());
 
-    // 3. Permisos de Administrador
+   
     if (usuario.getRolNombre().equals("Administrador")) {
         // Solo el Admin ve y usa el botón eliminar
         vista.getBtnEliminar().setVisible(true);
@@ -66,27 +66,27 @@ public class InventarioController {
 });
    
     } else {
-        // Oculta el botón para otros roles
+        
         vista.getBtnEliminar().setVisible(false);
     }
 
-    // 4. (Próximo paso) Listener para Doble-Clic (Editar)
-    // vista.getTablaProductos().addMouseListener(...)
+
+  
 }
     
     private void cargarDatosTabla() {
         
-    // 1. Obtener valores de los filtros
+    // Obtener valores de los filtros
     String busqueda = vista.getTxtBuscarProducto().getText();
     boolean soloStockBajo = vista.getChkStockBajo().isSelected();
 
-    // 2. Limpiar tabla
+    // Limpiar tabla
     modeloTabla.setRowCount(0);
 
-    // 3. Pedir datos al DAO (ahora con filtros)
+    //  Pedir datos al DAO 
     List<Producto> lista = dao.listarProductos(busqueda, soloStockBajo);
 
-    // 4. Llenar la tabla
+    // Llena la tabla
     for (Producto p : lista) {
         Object[] fila = new Object[6];
         fila[0] = p.getIdProducto();
@@ -101,7 +101,7 @@ public class InventarioController {
 }
     
     private void eliminarProductoSeleccionado() {
-    // 1. Obtener la fila seleccionada
+    
     int filaSeleccionada = vista.getTablaProductos().getSelectedRow();
 
     if (filaSeleccionada == -1) {
@@ -109,11 +109,11 @@ public class InventarioController {
         return;
     }
 
-    // 2. Obtener el ID y el Nombre (para confirmación)
+    
     int idProducto = (int) modeloTabla.getValueAt(filaSeleccionada, 0);
     String nombreProducto = (String) modeloTabla.getValueAt(filaSeleccionada, 1);
 
-    // 3. Pedir confirmación
+    
     int confirmacion = JOptionPane.showConfirmDialog(vista, 
         "¿Está seguro de que desea eliminar el producto: " + nombreProducto + "?",
         "Confirmar Eliminación", 
@@ -121,28 +121,28 @@ public class InventarioController {
         JOptionPane.WARNING_MESSAGE);
 
     if (confirmacion == JOptionPane.YES_OPTION) {
-        // 4. Proceder con la eliminación
+        
         boolean exito = dao.eliminar(idProducto);
 
         if (exito) {
             JOptionPane.showMessageDialog(vista, "Producto eliminado exitosamente.");
-            cargarDatosTabla(); // Recargar la tabla
+            cargarDatosTabla(); 
         }
-        // (Si hay error, el DAO ya mostró un mensaje)
+       
     }
 }
 
 private void abrirDialogoEditar() {
-    // 1. Obtener la fila seleccionada
+   
     int filaSeleccionada = vista.getTablaProductos().getSelectedRow();
     if (filaSeleccionada == -1) {
-        return; // No hay fila seleccionada
+        return; 
     }
 
-    // 2. Obtener el ID del producto de la tabla (columna 0)
+    // Obtener el ID del producto de la tabla (columna 0)
     int idProducto = (int) modeloTabla.getValueAt(filaSeleccionada, 0);
 
-    // 3. Buscar el producto en la BD
+    // Buscar el producto en la BD
     Producto productoAEditar = dao.buscarPorId(idProducto);
 
     if (productoAEditar == null) {
@@ -150,12 +150,12 @@ private void abrirDialogoEditar() {
         return;
     }
 
-    // 4. Crear la vista (Diálogo)
+    
     java.awt.Frame framePadre = (java.awt.Frame) SwingUtilities.getWindowAncestor(vista);
     ProductoDialog dialogView = new ProductoDialog(framePadre);
 
     // 5. Crear el controlador del diálogo
-    new ProductoDialogController(dialogView, dao, categoriaDAO, productoAEditar);
+    new ProductoDialogController(dialogView, dao, categoriaDAO, productoAEditar, true);
 
     // 6. Mostrar el diálogo
     dialogView.setVisible(true);

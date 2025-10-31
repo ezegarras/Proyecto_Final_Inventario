@@ -12,5 +12,5 @@ import modelo.Usuario;
  */
 public interface IUsuarioDAO {
     Usuario login(String usuario, String contrasena);
-    // (Aquí irán el resto de métodos CRUD)
+    
 }

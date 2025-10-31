@@ -11,6 +11,7 @@ import modelo.Entrada;
  *
  * @author Enrique Zegarra
  */
+
 public interface IEntradaDAO {
     /**
      * Inserta un nuevo registro de entrada Y actualiza el stock del producto.

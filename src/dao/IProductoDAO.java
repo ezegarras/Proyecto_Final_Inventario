@@ -11,6 +11,7 @@ import modelo.Producto;
  *
  * @author Enrique Zegarra
  */
+
 public interface IProductoDAO {
     
     /**

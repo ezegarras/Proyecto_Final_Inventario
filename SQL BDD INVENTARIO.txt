@@ -1,0 +1,124 @@
+CREATE DATABASE IF NOT EXISTS inventario_mype_v2;
+USE inventario_mype_v2;
+
+-- 1. Tabla Rol
+CREATE TABLE IF NOT EXISTS Rol (
+    id_rol INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(50) NOT NULL UNIQUE
+);
+
+-- 2. Tabla Categoria
+CREATE TABLE IF NOT EXISTS Categoria (
+    id_categoria INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(100) NOT NULL UNIQUE
+);
+
+-- 3. Tabla Proveedor
+CREATE TABLE IF NOT EXISTS Proveedor (
+    id_proveedor INT AUTO_INCREMENT PRIMARY KEY,
+    razon_social VARCHAR(255) NOT NULL,
+    ruc VARCHAR(11) NOT NULL UNIQUE,
+    celular VARCHAR(15),
+    correo VARCHAR(100),
+    direccion TEXT
+);
+
+-- 4. Tabla Cliente
+CREATE TABLE IF NOT EXISTS Cliente (
+    id_cliente INT AUTO_INCREMENT PRIMARY KEY,
+    dni VARCHAR(8) NOT NULL UNIQUE,
+    nombre VARCHAR(150) NOT NULL,
+    direccion TEXT,
+    celular VARCHAR(15),
+    correo VARCHAR(100),
+    edad INT,
+    sexo ENUM('Masculino', 'Femenino', 'Otro')
+);
+
+-- 5. Tabla Producto
+CREATE TABLE IF NOT EXISTS Producto (
+    id_producto INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(150) NOT NULL,
+    precio_unitario DECIMAL(10, 2) NOT NULL,
+    stock_actual INT NOT NULL DEFAULT 0,
+    stock_minimo INT NOT NULL DEFAULT 10,
+    id_categoria INT NOT NULL,
+    FOREIGN KEY (id_categoria) REFERENCES Categoria(id_categoria)
+);
+
+-- 6. Tabla Usuario
+CREATE TABLE IF NOT EXISTS Usuario (
+    id_usuario INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(150) NOT NULL,
+    usuario VARCHAR(50) NOT NULL UNIQUE,
+    contrasena VARCHAR(255) NOT NULL, -- (Almacenar un hash)
+    id_rol INT NOT NULL,
+    FOREIGN KEY (id_rol) REFERENCES Rol(id_rol)
+);
+
+-- 7. Tabla Factura
+CREATE TABLE IF NOT EXISTS Factura (
+    id_factura INT AUTO_INCREMENT PRIMARY KEY,
+    numero_factura VARCHAR(20) NOT NULL UNIQUE,
+    fecha DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    id_cliente INT NOT NULL,
+    igv DECIMAL(10, 2) NOT NULL,
+    subtotal DECIMAL(10, 2) NOT NULL,
+    total DECIMAL(10, 2) NOT NULL,
+    FOREIGN KEY (id_cliente) REFERENCES Cliente(id_cliente)
+);
+
+-- 8. Tabla Entrada
+CREATE TABLE IF NOT EXISTS Entrada (
+    id_entrada INT AUTO_INCREMENT PRIMARY KEY,
+    fecha DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    cantidad INT NOT NULL,
+    id_producto INT NOT NULL,
+    id_proveedor INT NOT NULL,
+    FOREIGN KEY (id_producto) REFERENCES Producto(id_producto),
+    FOREIGN KEY (id_proveedor) REFERENCES Proveedor(id_proveedor)
+);
+
+-- 9. Tabla Salida
+CREATE TABLE IF NOT EXISTS Salida (
+    id_salida INT AUTO_INCREMENT PRIMARY KEY,
+    id_factura INT NOT NULL,
+    id_producto INT NOT NULL,
+    cantidad INT NOT NULL,
+    precio_venta DECIMAL(10, 2) NOT NULL,
+    importe_total DECIMAL(10, 2) NOT NULL,
+    FOREIGN KEY (id_factura) REFERENCES Factura(id_factura),
+    FOREIGN KEY (id_producto) REFERENCES Producto(id_producto)
+);
+
+-- --- DATOS INICIALES (Si las tablas están vacías) ---
+
+-- Insertar Roles (solo si no existen)
+INSERT IGNORE INTO Rol (nombre) VALUES ('Administrador'), ('Almacen'), ('Ventas');
+
+-- Insertar Usuario Admin (solo si no existe)
+-- Contraseña 'admin' (debe ser hasheada en producción)
+INSERT IGNORE INTO Usuario (nombre, usuario, contrasena, id_rol) 
+VALUES ('Usuario Administrador', 'admin', 'admin', 1);
+
+-- Insertar Categorías (solo si no existen)
+INSERT IGNORE INTO Categoria (nombre) 
+VALUES 
+('Monitores'), 
+('Periféricos'), 
+('Componentes'),
+('Almacenamiento');
+
+-- Insertar Proveedores (solo si no existen)
+INSERT IGNORE INTO Proveedor (razon_social, ruc, celular) 
+VALUES 
+('Tech Supplies S.A.C.', '20123456789', '987654321'),
+('CompuGlobal E.I.R.L.', '20987654321', '987123456');
+
+-- Insertar Productos (solo si no existen)
+INSERT IGNORE INTO Producto (nombre, precio_unitario, stock_actual, stock_minimo, id_categoria) 
+VALUES 
+('Monitor Dell 24" P2419H', 150.00, 25, 5, 1),
+('Teclado Mecánico RGB HyperX', 75.50, 50, 10, 2),
+('Mouse Inalámbrico Logitech M510', 29.99, 100, 20, 2),
+('SSD Kingston 1TB NVMe', 89.90, 15, 5, 4);

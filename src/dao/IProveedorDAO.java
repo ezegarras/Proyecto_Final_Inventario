@@ -13,4 +13,7 @@ import modelo.Proveedor;
  */
 public interface IProveedorDAO {
     List<Proveedor> listarTodos();
+    boolean insertar(Proveedor proveedor);
+    boolean actualizar(Proveedor proveedor);
+    boolean eliminar(int idProveedor);
 }

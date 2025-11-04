@@ -24,7 +24,6 @@ public class DashboardController {
         this.vista = vista;
         this.usuario = usuario;
         
-        // Asignar eventos (listeners)
         inicializar();
     }
     
@@ -34,16 +33,24 @@ public class DashboardController {
     vista.getBtnCerrarSesion().addActionListener(e -> cerrarSesion());
 
     vista.getBtnNavHome().addActionListener(e -> 
-        vista.getCardLayout().show(vista.getPanelContent(), "home")
+    vista.getCardLayout().show(vista.getPanelContent(), "home")
     );
     vista.getBtnNavInventario().addActionListener(e -> 
-        vista.getCardLayout().show(vista.getPanelContent(), "inventario")
+    vista.getCardLayout().show(vista.getPanelContent(), "inventario")
     );
     // Aquí añado otros listeners
     vista.getBtnNavEntradas().addActionListener(e -> 
     vista.getCardLayout().show(vista.getPanelContent(), "entradas")
     );
-
+    vista.getBtnNavSalidas().addActionListener(e -> 
+    vista.getCardLayout().show(vista.getPanelContent(), "salidas")
+    );
+    vista.getBtnNavProveedores().addActionListener(e -> 
+    vista.getCardLayout().show(vista.getPanelContent(), "proveedores")
+    );
+    vista.getBtnNavClientes().addActionListener(e -> 
+    vista.getCardLayout().show(vista.getPanelContent(), "clientes")
+    );
    
     String rol = usuario.getRolNombre();
 
@@ -55,22 +62,28 @@ public class DashboardController {
 
     
     switch (rol) {
+        
         case "Administrador":
             
             vista.getBtnNavInventario().setVisible(true);
             vista.getBtnNavEntradas().setVisible(true);
             vista.getBtnNavSalidas().setVisible(true);
+            vista.getBtnNavProveedores().setVisible(true);
+            vista.getBtnNavClientes().setVisible(true);
             
             break;
+            
         case "Ventas":
             
             vista.getBtnNavSalidas().setVisible(true);
-            
+            vista.getBtnNavClientes().setVisible(true);
             break;
+            
         case "Almacen":
            
             vista.getBtnNavInventario().setVisible(true);
             vista.getBtnNavEntradas().setVisible(true);
+            vista.getBtnNavProveedores().setVisible(true);
            
             break;
     }

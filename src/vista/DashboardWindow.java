@@ -23,6 +23,8 @@ import modelo.Usuario;
 import utils.StyleManager;
 import javax.swing.BorderFactory;
 import java.awt.Dimension;
+import dao.IClienteDAO;
+import dao.ClienteDAOImpl;
 import dao.IEntradaDAO;
 import dao.IProveedorDAO;
 import dao.EntradaDAOImpl;
@@ -30,7 +32,7 @@ import dao.ProveedorDAOImpl;
 
 public class DashboardWindow extends JFrame {
 
-    // Paneles de la estructura
+    //Estructura
     private JPanel panelMenu;
     private JPanel panelHeader;
     private JPanel panelContent;
@@ -42,6 +44,8 @@ public class DashboardWindow extends JFrame {
     private JButton btnNavInventario;
     private JButton btnNavEntradas;
     private JButton btnNavSalidas;
+    private JButton btnNavProveedores;
+    private JButton btnNavClientes;
     private Usuario usuario;
     private CardLayout cardLayout; 
 
@@ -53,29 +57,31 @@ public class DashboardWindow extends JFrame {
     }
     
     private void initializeComponents(Usuario usuario) {
-        // --- Header ---
+        // cabeceras
         lblSaludo = StyleManager.createLabel("Hola, " + usuario.getNombre() + " (Perfil: " + usuario.getUsuario() + ")");
         btnCerrarSesion = StyleManager.createPrimaryButton("Cerrar Sesión");
         // (Estilo rojo para 'Cerrar Sesión')
         btnCerrarSesion.setBackground(new Color(211, 47, 47));
 
-        // --- Menú ---
+        // Menu
         btnNavHome = new JButton("Dashboard");
         btnNavInventario = new JButton("Inventario");
         btnNavEntradas = new JButton("Entradas");
         btnNavSalidas = new JButton("Salidas");
+        btnNavProveedores = new JButton("Proveedores");
+        btnNavClientes = new JButton("Clientes");
         
-        // --- Contenido ---
+        //Contenido
         cardLayout = new CardLayout();
         panelContent = new JPanel(cardLayout);
     }
     
     private void setupLayout() {
-        // --- Configuración JFrame ---
+        
         setLayout(new BorderLayout());
         
         // --- 1. Header (NORTH) ---
-        panelHeader = new JPanel(new BorderLayout(10, 10)); // HGap, VGap
+        panelHeader = new JPanel(new BorderLayout(10, 10));
         panelHeader.setBackground(Color.WHITE);
         panelHeader.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
         panelHeader.add(lblSaludo, BorderLayout.CENTER);
@@ -83,12 +89,12 @@ public class DashboardWindow extends JFrame {
         add(panelHeader, BorderLayout.NORTH);
 
         // --- 2. Menú (WEST) ---
-        panelMenu = new JPanel(new GridLayout(8, 1, 0, 10)); // 8 filas, 1 col, 0 HGap, 10 VGap
-        panelMenu.setBackground(new Color(51, 51, 51)); // Color oscuro
+        panelMenu = new JPanel(new GridLayout(8, 1, 0, 10)); 
+        panelMenu.setBackground(new Color(51, 51, 51));
         panelMenu.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
         
-        // (Aplicamos estilo a los botones del menú)
-        JButton[] menuButtons = {btnNavHome, btnNavInventario, btnNavEntradas, btnNavSalidas};
+        // 
+        JButton[] menuButtons = {btnNavHome, btnNavInventario, btnNavEntradas, btnNavSalidas, btnNavProveedores, btnNavClientes};
         for (JButton btn : menuButtons) {
             btn.setBackground(new Color(51, 51, 51));
             btn.setForeground(Color.WHITE);
@@ -100,36 +106,40 @@ public class DashboardWindow extends JFrame {
         }
         add(panelMenu, BorderLayout.WEST);
 
-        // --- 3. Contenido (CENTER) ---
+        // 
         panelContent.setBackground(StyleManager.GRIS_CLARO);
-        // Añadimos el panel de bienvenida como 'home'
+        
         panelContent.add(new HomePanel(), "home"); 
  
-        // --- AÑADIR ESTE BLOQUE ---
-        // Crear e instanciar el módulo de Inventario
+        
+        
         vista.InventarioPanel panelInventario = new vista.InventarioPanel();
         dao.IProductoDAO productoDAO = new dao.ProductoDAOImpl();
-        new controlador.InventarioController(panelInventario, productoDAO, usuario);        // Añadirlo al CardLayout
+        new controlador.InventarioController(panelInventario, productoDAO, usuario);
         panelContent.add(panelInventario, "inventario");
         
         // -------------------------
         // (Aquí añadiremos los otros paneles: "inventario", "entradas", etc.)
-        
-        // Crear e instanciar el módulo de Entradas
+       
         vista.EntradasPanel panelEntradas = new vista.EntradasPanel();
         dao.IEntradaDAO entradaDAO = new dao.EntradaDAOImpl();
         dao.IProveedorDAO proveedorDAO = new dao.ProveedorDAOImpl();
         dao.ICategoriaDAO categoriaDAO = new dao.CategoriaDAOImpl();
-        
         new controlador.EntradasController(panelEntradas, entradaDAO, productoDAO, proveedorDAO, categoriaDAO);
-
-        // Añadirlo al CardLayout
         panelContent.add(panelEntradas, "entradas");
-        // -------------------------
+        
+        vista.ProveedoresPanel panelProveedores = new vista.ProveedoresPanel();
+        dao.IProveedorDAO daoProv = new dao.ProveedorDAOImpl();
+        new controlador.ProveedoresController(panelProveedores, daoProv, usuario);
+        panelContent.add(panelProveedores, "proveedores");
+        
+        vista.ClientesPanel panelClientes = new vista.ClientesPanel();
+        dao.IClienteDAO daoCli = new dao.ClienteDAOImpl();
+        new controlador.ClientesController(panelClientes, daoCli, usuario);
+        panelContent.add(panelClientes, "clientes");
         
         add(panelContent, BorderLayout.CENTER);
         
-        // Mostramos 'home' por defecto
         cardLayout.show(panelContent, "home");
         
         
@@ -141,10 +151,10 @@ public class DashboardWindow extends JFrame {
         setMinimumSize(new Dimension(1024, 768));
         setSize(1200, 800);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setLocationRelativeTo(null); // Centrar
+        setLocationRelativeTo(null); 
     }
     
-    // --- Getters para el Controlador ---
+
     public CardLayout getCardLayout() { return cardLayout; }
     public JPanel getPanelContent() { return panelContent; }
     public JButton getBtnCerrarSesion() { return btnCerrarSesion; }
@@ -152,4 +162,6 @@ public class DashboardWindow extends JFrame {
     public JButton getBtnNavInventario() { return btnNavInventario; }
     public JButton getBtnNavEntradas() { return btnNavEntradas; }
     public JButton getBtnNavSalidas() { return btnNavSalidas; }
+    public JButton getBtnNavProveedores() { return btnNavProveedores; }
+    public JButton getBtnNavClientes() { return btnNavClientes; }
 }

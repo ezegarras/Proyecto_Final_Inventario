@@ -4,19 +4,14 @@
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
             <file>file:/C:/Users/Enrique%20Zegarra/Documents/NetBeansProjects/Proyecto_Final_Inventario/src/main/main.java</file>
-            <file>file:/C:/Users/Enrique%20Zegarra/Documents/NetBeansProjects/Proyecto_Final_Inventario/src/controlador/InventarioController.java</file>
-            <file>file:/C:/Users/Enrique%20Zegarra/Documents/NetBeansProjects/Proyecto_Final_Inventario/src/controlador/ProductoDialogController.java</file>
-            <file>file:/C:/Users/Enrique%20Zegarra/Documents/NetBeansProjects/Proyecto_Final_Inventario/src/controlador/LoginController.java</file>
-            <file>file:/C:/Users/Enrique%20Zegarra/Documents/NetBeansProjects/Proyecto_Final_Inventario/src/dao/EntradaDAOImpl.java</file>
-            <file>file:/C:/Users/Enrique%20Zegarra/Documents/NetBeansProjects/Proyecto_Final_Inventario/src/controlador/EntradasController.java</file>
-            <file>file:/C:/Users/Enrique%20Zegarra/Documents/NetBeansProjects/Proyecto_Final_Inventario/src/dao/ICategoriaDAO.java</file>
-            <file>file:/C:/Users/Enrique%20Zegarra/Documents/NetBeansProjects/Proyecto_Final_Inventario/src/dao/IUsuarioDAO.java</file>
-            <file>file:/C:/Users/Enrique%20Zegarra/Documents/NetBeansProjects/Proyecto_Final_Inventario/src/dao/IProductoDAO.java</file>
             <file>file:/C:/Users/Enrique%20Zegarra/Documents/NetBeansProjects/Proyecto_Final_Inventario/src/controlador/DashboardController.java</file>
-            <file>file:/C:/Users/Enrique%20Zegarra/Documents/NetBeansProjects/Proyecto_Final_Inventario/src/dao/CategoriaDAOImpl.java</file>
-            <file>file:/C:/Users/Enrique%20Zegarra/Documents/NetBeansProjects/Proyecto_Final_Inventario/src/dao/IProveedorDAO.java</file>
-            <file>file:/C:/Users/Enrique%20Zegarra/Documents/NetBeansProjects/Proyecto_Final_Inventario/src/dao/ProductoDAOImpl.java</file>
-            <file>file:/C:/Users/Enrique%20Zegarra/Documents/NetBeansProjects/Proyecto_Final_Inventario/src/dao/IEntradaDAO.java</file>
+            <file>file:/C:/Users/Enrique%20Zegarra/Documents/NetBeansProjects/Proyecto_Final_Inventario/src/dao/IClienteDAO.java</file>
+            <file>file:/C:/Users/Enrique%20Zegarra/Documents/NetBeansProjects/Proyecto_Final_Inventario/src/modelo/Cliente.java</file>
+            <file>file:/C:/Users/Enrique%20Zegarra/Documents/NetBeansProjects/Proyecto_Final_Inventario/src/dao/ClienteDAOImpl.java</file>
+            <file>file:/C:/Users/Enrique%20Zegarra/Documents/NetBeansProjects/Proyecto_Final_Inventario/src/vista/ClienteDialog.java</file>
+            <file>file:/C:/Users/Enrique%20Zegarra/Documents/NetBeansProjects/Proyecto_Final_Inventario/src/vista/DashboardWindow.java</file>
+            <file>file:/C:/Users/Enrique%20Zegarra/Documents/NetBeansProjects/Proyecto_Final_Inventario/src/vista/ClientesPanel.java</file>
+            <file>file:/C:/Users/Enrique%20Zegarra/Documents/NetBeansProjects/Proyecto_Final_Inventario/src/controlador/ClientesController.java</file>
         </group>
     </open-files>
 </project-private>

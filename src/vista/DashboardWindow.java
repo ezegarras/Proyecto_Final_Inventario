@@ -46,6 +46,8 @@ public class DashboardWindow extends JFrame {
     private JButton btnNavSalidas;
     private JButton btnNavProveedores;
     private JButton btnNavClientes;
+    private JButton btnNavReportes; 
+    private JButton btnNavUsuarios;
     private Usuario usuario;
     private CardLayout cardLayout; 
 
@@ -70,6 +72,8 @@ public class DashboardWindow extends JFrame {
         btnNavSalidas = new JButton("Salidas");
         btnNavProveedores = new JButton("Proveedores");
         btnNavClientes = new JButton("Clientes");
+        btnNavReportes = new JButton("Reportes");
+        btnNavUsuarios = new JButton("Usuarios");
         
         //Contenido
         cardLayout = new CardLayout();
@@ -80,7 +84,7 @@ public class DashboardWindow extends JFrame {
         
         setLayout(new BorderLayout());
         
-        // --- 1. Header (NORTH) ---
+        // Header
         panelHeader = new JPanel(new BorderLayout(10, 10));
         panelHeader.setBackground(Color.WHITE);
         panelHeader.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
@@ -88,13 +92,13 @@ public class DashboardWindow extends JFrame {
         panelHeader.add(btnCerrarSesion, BorderLayout.EAST);
         add(panelHeader, BorderLayout.NORTH);
 
-        // --- 2. Menú (WEST) ---
+        // Menú
         panelMenu = new JPanel(new GridLayout(8, 1, 0, 10)); 
         panelMenu.setBackground(new Color(51, 51, 51));
         panelMenu.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
         
         // 
-        JButton[] menuButtons = {btnNavHome, btnNavInventario, btnNavEntradas, btnNavSalidas, btnNavProveedores, btnNavClientes};
+        JButton[] menuButtons = {btnNavHome, btnNavInventario, btnNavEntradas, btnNavSalidas, btnNavClientes, btnNavProveedores, btnNavReportes, btnNavUsuarios};
         for (JButton btn : menuButtons) {
             btn.setBackground(new Color(51, 51, 51));
             btn.setForeground(Color.WHITE);
@@ -138,6 +142,14 @@ public class DashboardWindow extends JFrame {
         new controlador.ClientesController(panelClientes, daoCli, usuario);
         panelContent.add(panelClientes, "clientes");
         
+        // Crear e instanciar el módulo de Salidas
+        vista.SalidasPanel panelSalidas = new vista.SalidasPanel();
+        dao.IClienteDAO daoCliSalida = new dao.ClienteDAOImpl();
+        dao.IProductoDAO daoProdSalida = new dao.ProductoDAOImpl();
+        dao.ISalidaDAO daoSalida = new dao.SalidaDAOImpl();
+        new controlador.SalidasController(panelSalidas, daoCliSalida, daoProdSalida, daoSalida);
+        panelContent.add(panelSalidas, "salidas");
+        
         add(panelContent, BorderLayout.CENTER);
         
         cardLayout.show(panelContent, "home");
@@ -164,4 +176,6 @@ public class DashboardWindow extends JFrame {
     public JButton getBtnNavSalidas() { return btnNavSalidas; }
     public JButton getBtnNavProveedores() { return btnNavProveedores; }
     public JButton getBtnNavClientes() { return btnNavClientes; }
+    public JButton getBtnNavReportes() { return btnNavReportes; }
+    public JButton getBtnNavUsuarios() { return btnNavUsuarios; }
 }

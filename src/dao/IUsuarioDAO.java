@@ -4,6 +4,7 @@
  */
 package dao;
 
+import java.util.List;
 import modelo.Usuario;
 
 /**
@@ -12,5 +13,9 @@ import modelo.Usuario;
  */
 public interface IUsuarioDAO {
     Usuario login(String usuario, String contrasena);
+    List<Usuario> listarTodos();
+    boolean insertar(Usuario usuario);
+    boolean actualizar(Usuario usuario);
+    boolean eliminar(int idUsuario);
     
 }

@@ -8,6 +8,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 import modelo.Usuario;
 import utils.ConexionBD;
 
@@ -48,5 +50,74 @@ public class UsuarioDAOImpl implements IUsuarioDAO {
         }
         
         return user;
+    }
+    
+    @Override
+    public List<Usuario> listarTodos() {
+        List<Usuario> usuarios = new ArrayList<>();
+        String sql = "SELECT u.*, r.nombre as rol_nombre FROM Usuario u JOIN Rol r ON u.id_rol = r.id_rol ORDER BY u.nombre";
+        try (Connection con = ConexionBD.getConexion();
+             PreparedStatement ps = con.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                Usuario u = new Usuario();
+                u.setIdUsuario(rs.getInt("id_usuario"));
+                u.setNombre(rs.getString("nombre"));
+                u.setUsuario(rs.getString("usuario"));
+                u.setContrasena(rs.getString("contrasena"));
+                u.setIdRol(rs.getInt("id_rol"));
+                u.setRolNombre(rs.getString("rol_nombre"));
+                usuarios.add(u);
+            }
+        } catch (SQLException e) {
+            System.err.println("Error al listar usuarios: " + e.getMessage());
+        }
+        return usuarios;
+    }
+
+    @Override
+    public boolean insertar(Usuario u) {
+        String sql = "INSERT INTO Usuario (nombre, usuario, contrasena, id_rol) VALUES (?, ?, ?, ?)";
+        try (Connection con = ConexionBD.getConexion();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setString(1, u.getNombre());
+            ps.setString(2, u.getUsuario());
+            ps.setString(3, u.getContrasena());
+            ps.setInt(4, u.getIdRol());
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            System.err.println("Error al insertar usuario: " + e.getMessage());
+            return false;
+        }
+    }
+
+    @Override
+    public boolean actualizar(Usuario u) {
+        String sql = "UPDATE Usuario SET nombre=?, usuario=?, contrasena=?, id_rol=? WHERE id_usuario=?";
+        try (Connection con = ConexionBD.getConexion();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setString(1, u.getNombre());
+            ps.setString(2, u.getUsuario());
+            ps.setString(3, u.getContrasena());
+            ps.setInt(4, u.getIdRol());
+            ps.setInt(5, u.getIdUsuario());
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            System.err.println("Error al actualizar usuario: " + e.getMessage());
+            return false;
+        }
+    }
+
+    @Override
+    public boolean eliminar(int idUsuario) {
+        String sql = "DELETE FROM Usuario WHERE id_usuario=?";
+        try (Connection con = ConexionBD.getConexion();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, idUsuario);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            System.err.println("Error al eliminar usuario: " + e.getMessage());
+            return false;
+        }
     }
 }

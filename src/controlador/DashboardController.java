@@ -52,10 +52,10 @@ public class DashboardController {
     vista.getCardLayout().show(vista.getPanelContent(), "clientes")
     );
     vista.getBtnNavReportes().addActionListener(e -> 
-    vista.getCardLayout().show(vista.getPanelContent(), "reportes") // no exits
+    vista.getCardLayout().show(vista.getPanelContent(), "reportes") 
     );
     vista.getBtnNavUsuarios().addActionListener(e -> 
-    vista.getCardLayout().show(vista.getPanelContent(), "usuarios") // no exits
+    vista.getCardLayout().show(vista.getPanelContent(), "usuarios")
     );
     String rol = usuario.getRolNombre();
 
@@ -63,6 +63,7 @@ public class DashboardController {
     vista.getBtnNavInventario().setVisible(false);
     vista.getBtnNavEntradas().setVisible(false);
     vista.getBtnNavSalidas().setVisible(false);
+    vista.getBtnNavUsuarios().setVisible(false);
     
 
     
@@ -76,6 +77,7 @@ public class DashboardController {
             vista.getBtnNavProveedores().setVisible(true);
             vista.getBtnNavClientes().setVisible(true);
             vista.getBtnNavReportes().setVisible(true); 
+            vista.getBtnNavUsuarios().setVisible(true);
             vista.getBtnNavUsuarios().setVisible(true);
             
             break;

@@ -29,6 +29,8 @@ import dao.IEntradaDAO;
 import dao.IProveedorDAO;
 import dao.EntradaDAOImpl;
 import dao.ProveedorDAOImpl;
+import dao.IRolDAO;
+import dao.RolDAOImpl;
 
 public class DashboardWindow extends JFrame {
 
@@ -97,7 +99,7 @@ public class DashboardWindow extends JFrame {
         panelMenu.setBackground(new Color(51, 51, 51));
         panelMenu.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
         
-        // 
+        
         JButton[] menuButtons = {btnNavHome, btnNavInventario, btnNavEntradas, btnNavSalidas, btnNavClientes, btnNavProveedores, btnNavReportes, btnNavUsuarios};
         for (JButton btn : menuButtons) {
             btn.setBackground(new Color(51, 51, 51));
@@ -115,16 +117,13 @@ public class DashboardWindow extends JFrame {
         
         panelContent.add(new HomePanel(), "home"); 
  
-        
+        // ------------------------
         
         vista.InventarioPanel panelInventario = new vista.InventarioPanel();
         dao.IProductoDAO productoDAO = new dao.ProductoDAOImpl();
         new controlador.InventarioController(panelInventario, productoDAO, usuario);
         panelContent.add(panelInventario, "inventario");
         
-        // -------------------------
-        // (Aquí añadiremos los otros paneles: "inventario", "entradas", etc.)
-       
         vista.EntradasPanel panelEntradas = new vista.EntradasPanel();
         dao.IEntradaDAO entradaDAO = new dao.EntradaDAOImpl();
         dao.IProveedorDAO proveedorDAO = new dao.ProveedorDAOImpl();
@@ -142,13 +141,20 @@ public class DashboardWindow extends JFrame {
         new controlador.ClientesController(panelClientes, daoCli, usuario);
         panelContent.add(panelClientes, "clientes");
         
-        // Crear e instanciar el módulo de Salidas
+        // módulo de Salidas
         vista.SalidasPanel panelSalidas = new vista.SalidasPanel();
         dao.IClienteDAO daoCliSalida = new dao.ClienteDAOImpl();
         dao.IProductoDAO daoProdSalida = new dao.ProductoDAOImpl();
         dao.ISalidaDAO daoSalida = new dao.SalidaDAOImpl();
         new controlador.SalidasController(panelSalidas, daoCliSalida, daoProdSalida, daoSalida);
         panelContent.add(panelSalidas, "salidas");
+        
+        //Modulo usuario
+        vista.UsuariosPanel panelUsuarios = new vista.UsuariosPanel();
+        dao.IUsuarioDAO daoUser = new dao.UsuarioDAOImpl();
+        dao.IRolDAO daoRol = new dao.RolDAOImpl();
+        new controlador.UsuariosController(panelUsuarios, daoUser, daoRol);
+        panelContent.add(panelUsuarios, "usuarios");
         
         add(panelContent, BorderLayout.CENTER);
         

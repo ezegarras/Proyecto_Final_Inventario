@@ -20,6 +20,8 @@ import javax.swing.SwingUtilities;
 import vista.ProductoDialog;
 import dao.ICategoriaDAO;
 import dao.CategoriaDAOImpl;
+import utils.DataUpdateListener;
+import utils.DataUpdateNotifier;
 
 /**
  *
@@ -35,14 +37,16 @@ public class EntradasController {
     private final ICategoriaDAO categoriaDAO;
     
     private final DefaultTableModel modeloTabla;
+    private final DataUpdateNotifier notifier;
 
-    public EntradasController(EntradasPanel vista, IEntradaDAO eDAO, IProductoDAO pDAO, IProveedorDAO provDAO, ICategoriaDAO cDAO) {
+    public EntradasController(EntradasPanel vista, IEntradaDAO eDAO, IProductoDAO pDAO, IProveedorDAO provDAO, ICategoriaDAO cDAO, DataUpdateNotifier notifier) {
         this.vista = vista;
         this.entradaDAO = eDAO;
         this.productoDAO = pDAO;
         this.proveedorDAO = provDAO;
         this.categoriaDAO = cDAO;
         this.modeloTabla = vista.getModeloTablaHistorial();
+        this.notifier = notifier;
         
         inicializar();
     }
@@ -72,7 +76,7 @@ public class EntradasController {
        
         List<Producto> productos = productoDAO.listarProductos("", false); 
         DefaultComboBoxModel<Producto> modelProducto = new DefaultComboBoxModel<>();
-        modelProducto.addElement(null); // Opción "Seleccione..."
+        modelProducto.addElement(null); 
         for (Producto p : productos) {
             modelProducto.addElement(p);
         }
@@ -81,7 +85,7 @@ public class EntradasController {
         // Cargar Proveedores
         List<Proveedor> proveedores = proveedorDAO.listarTodos();
         DefaultComboBoxModel<Proveedor> modelProveedor = new DefaultComboBoxModel<>();
-        modelProveedor.addElement(null); // Opción "Seleccione..."
+        modelProveedor.addElement(null); 
         for (Proveedor p : proveedores) {
             modelProveedor.addElement(p);
         }
@@ -89,7 +93,7 @@ public class EntradasController {
     }
     
     private void cargarHistorial() {
-        modeloTabla.setRowCount(0); // Limpiar tabla
+        modeloTabla.setRowCount(0);
         
         
         List<Entrada> entradas = entradaDAO.listarUltimas(20); 
@@ -105,7 +109,7 @@ public class EntradasController {
     }
     
     private void registrarEntrada() {
-        // Obtener y validar datos del formulario
+        // Obtiene y valida datos del formulario
         Producto producto = (Producto) vista.getCmbProducto().getSelectedItem();
         Proveedor proveedor = (Proveedor) vista.getCmbProveedor().getSelectedItem();
         int cantidad = (Integer) vista.getSpinCantidad().getValue();
@@ -123,19 +127,20 @@ public class EntradasController {
         nuevaEntrada.setCantidad(cantidad);
         nuevaEntrada.setFecha(fecha);
         
-        // Llama al DAO (que maneja la transacción)
+        // Llama al DAO que maneja la transacción
         boolean exito = entradaDAO.registrarEntrada(nuevaEntrada);
         
         if (exito) {
             JOptionPane.showMessageDialog(vista, "Entrada registrada exitosamente. Stock actualizado.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
             cargarHistorial(); 
+            
 
         } else {
             JOptionPane.showMessageDialog(vista, "Error al registrar la entrada. La base de datos revirtió los cambios.", "Error de Transacción", JOptionPane.ERROR_MESSAGE);
         }
     }
     
-    private void abrirDialogoNuevoProducto() {
+    private void abrirDialogoNuevoProducto() {  
     
     java.awt.Frame framePadre = (java.awt.Frame) SwingUtilities.getWindowAncestor(vista);
 
@@ -146,7 +151,7 @@ public class EntradasController {
     Producto productoNuevo = new Producto();
 
    
-    new ProductoDialogController(dialogView, productoDAO, categoriaDAO, productoNuevo, false);
+    new ProductoDialogController(dialogView, productoDAO, categoriaDAO, productoNuevo, false, notifier);
 
     
     dialogView.setVisible(true);

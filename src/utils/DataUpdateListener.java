@@ -2,18 +2,18 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Interface.java to edit this template
  */
-package dao;
-
-import java.util.List;
-import modelo.Categoria;
+package utils;
 
 /**
  *
  * @author Enrique Zegarra
  */
-public interface ICategoriaDAO {
-    
-    List<Categoria> listarTodas();
-    boolean insertar(Categoria categoria);
+
+/**
+ * Interfaz para el patrón Observer.
+ */
+
+public interface DataUpdateListener {
+    void onDataChanged();
     
 }

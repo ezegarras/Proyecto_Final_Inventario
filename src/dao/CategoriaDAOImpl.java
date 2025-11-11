@@ -40,4 +40,19 @@ public class CategoriaDAOImpl implements ICategoriaDAO {
         }
         return categorias;
     }
+    
+    @Override
+    public boolean insertar(Categoria categoria) {
+        String sql = "INSERT INTO Categoria (nombre) VALUES (?)";
+        try (Connection con = ConexionBD.getConexion();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            
+            ps.setString(1, categoria.getNombre());
+            return ps.executeUpdate() > 0;
+            
+        } catch (SQLException e) {
+            System.err.println("Error al insertar categoría: " + e.getMessage());
+            return false;
+        }
+    }
 }

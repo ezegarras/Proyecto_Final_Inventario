@@ -14,17 +14,43 @@ import modelo.Usuario;
 import utils.NavigationManager;
 import vista.DashboardWindow;
 import vista.LoginWindow;
+import dao.*;
+import utils.DataUpdateNotifier;
 
 public class DashboardController {
 
     private final DashboardWindow vista;
     private final Usuario usuario;
     
-    public DashboardController(DashboardWindow vista, Usuario usuario) {    
-        this.vista = vista;
-        this.usuario = usuario;
-        
-        inicializar();
+    private final IProductoDAO productoDAO;
+    private final ICategoriaDAO categoriaDAO;
+    private final IProveedorDAO proveedorDAO;
+    private final IEntradaDAO entradaDAO;
+    private final IClienteDAO clienteDAO;
+    private final ISalidaDAO salidaDAO;
+    private final IUsuarioDAO usuarioDAO;
+    private final IRolDAO rolDAO;
+    private final DataUpdateNotifier notifier; 
+    
+    public DashboardController(DashboardWindow vista, Usuario usuario, IProductoDAO pDAO, ICategoriaDAO cDAO, 
+                           IProveedorDAO provDAO, IEntradaDAO eDAO, IClienteDAO cliDAO, 
+                           ISalidaDAO sDAO, IUsuarioDAO uDAO, IRolDAO rDAO, DataUpdateNotifier notifier) {
+
+    this.vista = vista;
+    this.usuario = usuario;
+
+    // Guarda todos los DAOs
+    this.productoDAO = pDAO;
+    this.categoriaDAO = cDAO;
+    this.proveedorDAO = provDAO;
+    this.entradaDAO = eDAO;
+    this.clienteDAO = cliDAO;
+    this.salidaDAO = sDAO;
+    this.usuarioDAO = uDAO;
+    this.rolDAO = rDAO;
+    this.notifier = notifier;
+
+    inicializar();
     }
     
     private void inicializar() {
@@ -103,7 +129,8 @@ public class DashboardController {
         // Crea la nueva vista de Login
         LoginWindow loginView = new LoginWindow();
         // Crea su controlador
-        new LoginController(loginView);
+        new LoginController(loginView, usuarioDAO, productoDAO, categoriaDAO, 
+                    proveedorDAO, entradaDAO, clienteDAO, salidaDAO, rolDAO, notifier);
         // Navega
         NavigationManager.navigateTo(vista, loginView);
     }

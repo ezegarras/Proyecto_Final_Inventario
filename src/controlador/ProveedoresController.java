@@ -13,6 +13,8 @@ import modelo.Proveedor;
 import modelo.Usuario;
 import vista.ProveedorDialog;
 import vista.ProveedoresPanel;
+import utils.DataUpdateListener;
+import utils.DataUpdateNotifier;
 
 
 /**
@@ -27,11 +29,13 @@ public class ProveedoresController {
     private final IProveedorDAO dao;
     private final DefaultTableModel modeloTabla;
     private final Usuario usuario; 
+    private final DataUpdateNotifier notifier;
 
-    public ProveedoresController(ProveedoresPanel vista, IProveedorDAO dao, Usuario usuario) {
+    public ProveedoresController(ProveedoresPanel vista, IProveedorDAO dao, Usuario usuario, DataUpdateNotifier notifier) {
         this.vista = vista;
         this.dao = dao;
         this.usuario = usuario;
+        this.notifier = notifier;
         this.modeloTabla = vista.getModeloTabla();
         
         inicializar();
@@ -110,6 +114,7 @@ public class ProveedoresController {
                 
                 if (exito) {
                     cargarDatosTabla();
+                    this.notifier.notifyListeners();
                     dialog.dispose();
                 } else {
                     JOptionPane.showMessageDialog(dialog, "Error al guardar el proveedor.", "Error", JOptionPane.ERROR_MESSAGE);
@@ -132,6 +137,7 @@ public class ProveedoresController {
         if (confirm == JOptionPane.YES_OPTION) {
             if (dao.eliminar(p.getIdProveedor())) {
                 cargarDatosTabla();
+                this.notifier.notifyListeners();
             }
         }
     }

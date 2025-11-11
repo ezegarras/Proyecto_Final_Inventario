@@ -9,6 +9,7 @@ package vista;
  * @author Enrique Zegarra
  */
 
+import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -21,8 +22,7 @@ import javax.swing.*;
 import modelo.Categoria;
 import modelo.Producto;
 import utils.StyleManager;
-import javax.swing.DefaultListCellRenderer;
-import javax.swing.JList;
+
 
 public class ProductoDialog extends JDialog {
 
@@ -33,6 +33,10 @@ public class ProductoDialog extends JDialog {
     private JComboBox<Categoria> cmbCategoria; 
     private JButton btnGuardar;
     private JButton btnCancelar;
+    private JLabel lblStockActual;
+    private JButton btnNuevaCategoria;
+    
+    
 
     public ProductoDialog(Frame owner) {
      
@@ -43,6 +47,8 @@ public class ProductoDialog extends JDialog {
         configureWindow();
     }
     
+    
+    
     private void initializeComponents() {
         txtNombre = StyleManager.createStyledTextField();
         txtPrecio = StyleManager.createStyledTextField();
@@ -52,6 +58,7 @@ public class ProductoDialog extends JDialog {
         spinStockMinimo = new JSpinner(new SpinnerNumberModel(0, 0, 9999, 1));
         
         cmbCategoria = new JComboBox<>();
+        btnNuevaCategoria = new JButton("+");
         btnGuardar = StyleManager.createPrimaryButton("Guardar Cambios");
         btnCancelar = new JButton("Cancelar");
     }
@@ -77,7 +84,9 @@ public class ProductoDialog extends JDialog {
 
         // Fila 2: Stock Actual
         gbc.gridx = 0; gbc.gridy = 2;
-        panel.add(StyleManager.createLabel("Stock Actual:"), gbc);
+        //panel.add(StyleManager.createLabel("Stock Actual:"), gbc);
+        lblStockActual = StyleManager.createLabel("Stock Actual:");
+        panel.add(lblStockActual, gbc);
         gbc.gridx = 1; gbc.gridy = 2;
         panel.add(spinStockActual, gbc);
 
@@ -90,8 +99,11 @@ public class ProductoDialog extends JDialog {
         // Fila 4: Categoría
         gbc.gridx = 0; gbc.gridy = 4;
         panel.add(StyleManager.createLabel("Categoría:"), gbc);
+        JPanel panelCategoria = new JPanel(new BorderLayout(5, 0));
+        panelCategoria.add(cmbCategoria, BorderLayout.CENTER);
+        panelCategoria.add(btnNuevaCategoria, BorderLayout.EAST);
         gbc.gridx = 1; gbc.gridy = 4;
-        panel.add(cmbCategoria, gbc);
+        panel.add(panelCategoria, gbc);
         
         // Fila 5: Botones
         JPanel panelBotones = new JPanel(new FlowLayout(FlowLayout.RIGHT));
@@ -118,6 +130,9 @@ public class ProductoDialog extends JDialog {
     public JSpinner getSpinStockActual() { return spinStockActual; }
     public JSpinner getSpinStockMinimo() { return spinStockMinimo; }
     public JComboBox<Categoria> getCmbCategoria() { return cmbCategoria; }
+    public JLabel getLblStockActual() { return lblStockActual; }
+    public JButton getBtnNuevaCategoria() { return btnNuevaCategoria; }
+    
     
  
     public void setProducto(Producto p) {
@@ -139,10 +154,21 @@ public class ProductoDialog extends JDialog {
     /**
      * Lee los datos del formulario y los aplica a un objeto Producto.
      */
+    
+    
     public Producto getProductoActualizado(Producto p) throws NumberFormatException {
         p.setNombre(txtNombre.getText());
         p.setPrecioUnitario(Double.parseDouble(txtPrecio.getText()));
+    // --- MODIFICAR ESTO ---
+    if (spinStockActual.isVisible()) {
+        // Modo Edición: lee el valor del spinner
         p.setStockActual((Integer) spinStockActual.getValue());
+    } else {
+        // Modo Creación: el stock es 0 (lo definirá la 'Entrada')
+        p.setStockActual(0); 
+    }
+    // --------------------
+
         p.setStockMinimo((Integer) spinStockMinimo.getValue());
         
         Categoria catSeleccionada = (Categoria) cmbCategoria.getSelectedItem();
@@ -171,4 +197,8 @@ public class ProductoDialog extends JDialog {
             }
         });
     }
+   
+  
 }
+
+

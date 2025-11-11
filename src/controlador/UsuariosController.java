@@ -16,6 +16,8 @@ import modelo.Rol;
 import modelo.Usuario;
 import vista.UsuarioDialog;
 import vista.UsuariosPanel;
+import utils.DataUpdateListener;
+import utils.DataUpdateNotifier;
 
 /**
  *
@@ -28,15 +30,17 @@ public class UsuariosController {
     private final IUsuarioDAO usuarioDAO;
     private final IRolDAO rolDAO;
     private final DefaultTableModel modeloTabla;
+    private final DataUpdateNotifier notifier;
     
    
     private List<Usuario> listaUsuarios;
 
-    public UsuariosController(UsuariosPanel vista, IUsuarioDAO uDAO, IRolDAO rDAO) {
+    public UsuariosController(UsuariosPanel vista, IUsuarioDAO uDAO, IRolDAO rDAO, DataUpdateNotifier notifier) {
         this.vista = vista;
         this.usuarioDAO = uDAO;
         this.rolDAO = rDAO;
         this.modeloTabla = vista.getModeloTabla();
+        this.notifier = notifier;
         inicializar();
     }
 
@@ -91,12 +95,14 @@ public class UsuariosController {
                 if (modoEdicion) {
                     u.setIdUsuario(usuarioEditar.getIdUsuario());
                     exito = usuarioDAO.actualizar(u);
+                    
                 } else {
                     exito = usuarioDAO.insertar(u);
                 }
                 if (exito) {
                     cargarDatosTabla();
                     dialog.dispose();
+                    this.notifier.notifyListeners();
                 } else {
                     JOptionPane.showMessageDialog(dialog, "Error al guardar (¿Usuario duplicado?).", "Error", JOptionPane.ERROR_MESSAGE);
                 }
@@ -115,6 +121,7 @@ public class UsuariosController {
         if (confirm == JOptionPane.YES_OPTION) {
             if (usuarioDAO.eliminar(u.getIdUsuario())) {
                 cargarDatosTabla();
+                this.notifier.notifyListeners();
             }
         }
     }

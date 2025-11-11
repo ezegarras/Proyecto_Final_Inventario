@@ -14,27 +14,33 @@ import modelo.Usuario;
 import vista.InventarioPanel;
 import javax.swing.SwingUtilities;
 import vista.ProductoDialog;
+import utils.DataUpdateListener;
+import utils.DataUpdateNotifier;
 
 /**
  *
  * @author Enrique Zegarra
  */
-public class InventarioController {
+public class InventarioController implements DataUpdateListener{
     
     private final InventarioPanel vista;
     private final IProductoDAO dao;
     private final ICategoriaDAO categoriaDAO;
     private final DefaultTableModel modeloTabla;
     private final Usuario usuario;
+    private final DataUpdateNotifier notifier;
 
-    public InventarioController(InventarioPanel vista, IProductoDAO dao, Usuario usuario) {
+    public InventarioController(InventarioPanel vista, IProductoDAO dao, Usuario usuario, DataUpdateNotifier notifier) {
     this.vista = vista;
     this.dao = dao;
     this.categoriaDAO = new dao.CategoriaDAOImpl();
     this.usuario = usuario; 
+    this.notifier = notifier;
     this.modeloTabla = vista.getModeloTabla();
 
     inicializar();
+    
+    this.notifier.addListener(this);
 }
     
     private void inicializar() {
@@ -155,7 +161,7 @@ private void abrirDialogoEditar() {
     ProductoDialog dialogView = new ProductoDialog(framePadre);
 
     // 5. Crear el controlador del diálogo
-    new ProductoDialogController(dialogView, dao, categoriaDAO, productoAEditar, true);
+    new ProductoDialogController(dialogView, dao, categoriaDAO, productoAEditar, true, notifier);
 
     // 6. Mostrar el diálogo
     dialogView.setVisible(true);
@@ -163,5 +169,10 @@ private void abrirDialogoEditar() {
     // 7. (Importante) Cuando el diálogo se cierra, recargamos la tabla
     cargarDatosTabla();
 }
-    
+
+@Override
+public void onDataChanged() {
+    System.out.println("InventarioController: ¡Datos cambiaron! Recargando tabla...");
+    cargarDatosTabla();
+}
 }

@@ -18,15 +18,16 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+import modelo.Producto;
 import utils.StyleManager;
 
 public class SalidasPanel extends JPanel {
 
-    // Componentes del Formulario de Venta ---
+    
     private JTextField txtBuscarClienteDNI;
     private JButton btnBuscarCliente;
     private JLabel lblNombreCliente;
-    private JTextField txtBuscarProducto; 
+    private JComboBox<Producto> cmbProductoVenta; 
     private JSpinner spinCantidadProducto;
     private JButton btnAgregarAlCarrito;
     private JTable tblCarrito;
@@ -74,10 +75,10 @@ public class SalidasPanel extends JPanel {
         
         JPanel panelAgregar = new JPanel(new FlowLayout(FlowLayout.LEFT));
         panelAgregar.add(StyleManager.createLabel("Producto:"));
-        txtBuscarProducto = StyleManager.createStyledTextField();
-        txtBuscarProducto.setPreferredSize(new Dimension(150, 30));
-        txtBuscarProducto.putClientProperty("JTextField.placeholderText", "Buscar producto...");
-        
+        cmbProductoVenta = new JComboBox<>();
+        cmbProductoVenta.setPreferredSize(new Dimension(200, 30));
+        panelAgregar.add(cmbProductoVenta);
+
         panelAgregar.add(StyleManager.createLabel("Cant:"));
         spinCantidadProducto = new JSpinner(new SpinnerNumberModel(1, 1, 100, 1));
         btnAgregarAlCarrito = new JButton("Añadir al Carrito");
@@ -137,7 +138,7 @@ public class SalidasPanel extends JPanel {
     public JTextField getTxtBuscarClienteDNI() { return txtBuscarClienteDNI; }
     public JButton getBtnBuscarCliente() { return btnBuscarCliente; }
     public JLabel getLblNombreCliente() { return lblNombreCliente; }
-    public JTextField getTxtBuscarProducto() { return txtBuscarProducto; }
+    public JComboBox<Producto> getCmbProductoVenta() { return cmbProductoVenta; }
     public JSpinner getSpinCantidadProducto() { return spinCantidadProducto; }
     public JButton getBtnAgregarAlCarrito() { return btnAgregarAlCarrito; }
     public JTable getTblCarrito() { return tblCarrito; }

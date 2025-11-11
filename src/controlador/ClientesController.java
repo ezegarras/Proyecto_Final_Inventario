@@ -19,18 +19,22 @@ import modelo.Cliente;
 import modelo.Usuario;
 import vista.ClienteDialog;
 import vista.ClientesPanel;
+import utils.DataUpdateListener;
+import utils.DataUpdateNotifier;
 
 public class ClientesController {
     
     private final ClientesPanel vista;
     private final IClienteDAO dao;
     private final DefaultTableModel modeloTabla;
-    private final Usuario usuario; // Para permisos
+    private final Usuario usuario;
+    private final DataUpdateNotifier notifier;
 
-    public ClientesController(ClientesPanel vista, IClienteDAO dao, Usuario usuario) {
+    public ClientesController(ClientesPanel vista, IClienteDAO dao, Usuario usuario, DataUpdateNotifier notifier) {
         this.vista = vista;
         this.dao = dao;
         this.usuario = usuario;
+        this.notifier = notifier;
         this.modeloTabla = vista.getModeloTabla();
         
         inicializar();
@@ -107,6 +111,7 @@ public class ClientesController {
                 
                 if (exito) {
                     cargarDatosTabla();
+                    this.notifier.notifyListeners();
                     dialog.dispose();
                 } else {
                     JOptionPane.showMessageDialog(dialog, "Error al guardar el cliente.", "Error", JOptionPane.ERROR_MESSAGE);
@@ -129,6 +134,7 @@ public class ClientesController {
         if (confirm == JOptionPane.YES_OPTION) {
             if (dao.eliminar(c.getIdCliente())) {
                 cargarDatosTabla();
+                this.notifier.notifyListeners();
             }
         }
     }

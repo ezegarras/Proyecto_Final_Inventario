@@ -11,6 +11,7 @@ import javax.swing.JOptionPane;
 import modelo.Categoria;
 import modelo.Producto;
 import vista.ProductoDialog;
+import utils.DataUpdateNotifier;
 
 /**
  *
@@ -24,13 +25,15 @@ public class ProductoDialogController {
     private final ICategoriaDAO categoriaDAO;
     private final Producto producto;
     private final boolean modoEdicion;
+    private final DataUpdateNotifier notifier;
 
-    public ProductoDialogController(ProductoDialog vista, IProductoDAO pDAO, ICategoriaDAO cDAO, Producto producto, boolean modoEdicion) {
+    public ProductoDialogController(ProductoDialog vista, IProductoDAO pDAO, ICategoriaDAO cDAO, Producto producto, boolean modoEdicion, DataUpdateNotifier notifier) {
         this.vista = vista;
         this.productoDAO = pDAO;
         this.categoriaDAO = cDAO;
         this.producto = producto;
         this.modoEdicion = modoEdicion;
+        this.notifier = notifier;
         
         //  Cargar datos en la vista
         cargarDatos();
@@ -38,19 +41,34 @@ public class ProductoDialogController {
         // Asignar listeners
         this.vista.getBtnGuardar().addActionListener(e -> guardarCambios());
         this.vista.getBtnCancelar().addActionListener(e -> vista.dispose());
+        this.vista.getBtnNuevaCategoria().addActionListener(e -> crearNuevaCategoria());
     }
     
     private void cargarDatos() {
     // Cargar la lista de categorías
-    List<Categoria> categorias = categoriaDAO.listarTodas();
-    vista.setCategorias(categorias);
+    refrescarComboCategorias();
 
-    // Llenar el formulario 
     if (modoEdicion) {
         vista.setProducto(producto);
         vista.setTitle("Editar Producto"); 
     } else {
-        vista.setTitle("Crear Nuevo Producto"); 
+        vista.setTitle("Crear Nuevo Producto");
+        // Ocultamos los campos de Stock Actual
+        vista.getLblStockActual().setVisible(false);
+        vista.getSpinStockActual().setVisible(false);
+    }
+}
+    
+    private void refrescarComboCategorias() {
+    // Guarda la categoría seleccionada (si hay una)
+    Object seleccionActual = vista.getCmbCategoria().getSelectedItem();
+
+    List<Categoria> categorias = categoriaDAO.listarTodas();
+    vista.setCategorias(categorias); // (Esto llama al setModel)
+
+    // Vuelve a seleccionar la que estaba (si aún existe)
+    if (seleccionActual != null) {
+        vista.getCmbCategoria().setSelectedItem(seleccionActual);
     }
 }
     
@@ -74,6 +92,7 @@ public class ProductoDialogController {
 
             if (exito) {
                 JOptionPane.showMessageDialog(vista, "Producto actualizado exitosamente.");
+                this.notifier.notifyListeners();
                 vista.dispose(); 
             } else {
                 JOptionPane.showMessageDialog(vista, "Error al actualizar el producto.", "Error", JOptionPane.ERROR_MESSAGE);
@@ -86,6 +105,7 @@ public class ProductoDialogController {
 
             if (exito) {
                 JOptionPane.showMessageDialog(vista, "Producto creado exitosamente.");
+                this.notifier.notifyListeners();
                 vista.dispose(); 
             } else {
                 JOptionPane.showMessageDialog(vista, "Error al crear el producto.", "Error", JOptionPane.ERROR_MESSAGE);
@@ -93,6 +113,27 @@ public class ProductoDialogController {
         } 
         } catch (NumberFormatException e) {
             JOptionPane.showMessageDialog(vista, "El formato del precio es incorrecto.", "Error de Validación", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+    
+    private void crearNuevaCategoria() {
+    String nombreNuevaCat = JOptionPane.showInputDialog(
+        vista, 
+        "Ingrese el nombre de la nueva categoría:", 
+        "Nueva Categoría", 
+        JOptionPane.PLAIN_MESSAGE
+    );
+
+    if (nombreNuevaCat != null && !nombreNuevaCat.trim().isEmpty()) {
+        Categoria nuevaCat = new Categoria();
+        nuevaCat.setNombre(nombreNuevaCat.trim());
+
+        if (categoriaDAO.insertar(nuevaCat)) {
+            JOptionPane.showMessageDialog(vista, "Categoría creada exitosamente.");
+            refrescarComboCategorias(); // Recargamos el ComboBox
+        } else {
+            JOptionPane.showMessageDialog(vista, "Error al crear la categoría (quizás ya existe).", "Error", JOptionPane.ERROR_MESSAGE);
+            }
         }
     }
 }

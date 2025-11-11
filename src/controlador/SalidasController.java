@@ -17,20 +17,23 @@ import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import javax.swing.JOptionPane;
+import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import modelo.Cliente;
 import modelo.Factura;
 import modelo.Producto;
 import modelo.Salida;
 import vista.SalidasPanel;
+import utils.DataUpdateListener;
+import utils.DataUpdateNotifier;
 
-public class SalidasController {
+public class SalidasController implements DataUpdateListener {
     
     private final SalidasPanel vista;
     private final IClienteDAO clienteDAO;
     private final IProductoDAO productoDAO;
     private final ISalidaDAO salidaDAO;
+    private final DataUpdateNotifier notifier;
     
    
     private Cliente clienteActual = null;
@@ -38,20 +41,52 @@ public class SalidasController {
     private final DefaultTableModel modeloCarrito;
     private final DefaultTableModel modeloHistorial;
 
-    public SalidasController(SalidasPanel vista, IClienteDAO cDAO, IProductoDAO pDAO, ISalidaDAO sDAO) {
+    public SalidasController(SalidasPanel vista, IClienteDAO cDAO, IProductoDAO pDAO, ISalidaDAO sDAO, DataUpdateNotifier notifier) {
         this.vista = vista;
         this.clienteDAO = cDAO;
         this.productoDAO = pDAO;
         this.salidaDAO = sDAO;
         this.modeloCarrito = vista.getModeloTablaCarrito();
         this.modeloHistorial = vista.getModeloTablaHistorial();
+        this.notifier = notifier;
         
         inicializar();
+        this.notifier.addListener(this);
     }
+    
+    
+    
+    private void cargarComboProductos() {
+    // Usamos el renderer que creamos para el panel de Entradas
+    vista.getCmbProductoVenta().setRenderer(new javax.swing.DefaultListCellRenderer() {
+      
+        @Override
+        public java.awt.Component getListCellRendererComponent(javax.swing.JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+            super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+            if (value instanceof Producto) {
+                // Mostramos "Nombre (Stock: X)"
+                Producto p = (Producto) value;
+                setText(p.getNombre() + " (Stock: " + p.getStockActual() + ")");
+            } else {
+                setText("Seleccione un producto...");
+            }
+            return this;
+        }
+    });
+
+    // Cargamos los productos
+    List<Producto> productos = productoDAO.listarProductos("", false); // Trae todos
+    DefaultComboBoxModel<Producto> model = new DefaultComboBoxModel<>();
+    model.addElement(null); // Opción "Seleccione..."
+    for (Producto p : productos) {
+        model.addElement(p);
+    }
+    vista.getCmbProductoVenta().setModel(model);
+}
     
     private void inicializar() {
         cargarHistorial();
-        
+        cargarComboProductos();
        
         vista.getBtnBuscarCliente().addActionListener(e -> buscarCliente());
         vista.getBtnAgregarAlCarrito().addActionListener(e -> agregarAlCarrito());
@@ -67,6 +102,7 @@ public class SalidasController {
             }
         });
     }
+    
     
     private void buscarCliente() {
         String dni = vista.getTxtBuscarClienteDNI().getText().trim();
@@ -87,12 +123,10 @@ public class SalidasController {
     
     private void agregarAlCarrito() {
         
-        Producto producto;
-        try {
-            int idProducto = Integer.parseInt(vista.getTxtBuscarProducto().getText().trim());
-            producto = productoDAO.buscarPorId(idProducto);
-        } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(vista, "Ingrese un ID de producto válido.", "Error", JOptionPane.ERROR_MESSAGE);
+        Producto producto = (Producto) vista.getCmbProductoVenta().getSelectedItem();
+
+        if (producto == null) {
+            JOptionPane.showMessageDialog(vista, "Seleccione un producto.", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
         
@@ -131,7 +165,7 @@ public class SalidasController {
         actualizarTotal();
         
         
-        vista.getTxtBuscarProducto().setText("");
+        //vista.getTxtBuscarProducto().setText("");
         vista.getSpinCantidadProducto().setValue(1);
     }
 
@@ -188,6 +222,7 @@ public class SalidasController {
             JOptionPane.showMessageDialog(vista, "Venta registrada exitosamente.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
             limpiarFormularioVenta();
             cargarHistorial();
+            this.notifier.notifyListeners();
             
         } else {
             JOptionPane.showMessageDialog(vista, "Error al registrar la venta. Transacción revertida.", "Error", JOptionPane.ERROR_MESSAGE);
@@ -200,8 +235,12 @@ public class SalidasController {
         modeloCarrito.setRowCount(0);
         vista.getLblNombreCliente().setText("Cliente: (No seleccionado)");
         vista.getTxtBuscarClienteDNI().setText("");
+        vista.getCmbProductoVenta().setSelectedIndex(0);
         actualizarTotal();
+        
     }
+    
+    
     
     private void cargarHistorial() {
         modeloHistorial.setRowCount(0);
@@ -218,8 +257,21 @@ public class SalidasController {
     }
     
     
+    
     private String generarNumeroFactura() {
         
         return "F001-" + (System.currentTimeMillis() / 1000);
+    }
+    
+    /**
+     * Método del observador (DataUpdateListener).
+     * Se ejecuta cuando otro módulo notifica un cambio en los datos.
+     */
+    @Override
+    public void onDataChanged() {
+        System.out.println("SalidasController: ¡Datos cambiaron! Recargando combo de productos e historial...");
+        
+        cargarComboProductos();
+        cargarHistorial();
     }
 }

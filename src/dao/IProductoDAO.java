@@ -40,4 +40,11 @@ public interface IProductoDAO {
      * @return El ID autogenerado del nuevo producto, o -1 si falla.
      */
     int insertar(Producto producto);
+   
+    
+    /**
+     * Devuelve una lista de productos donde el stock actual es menor o igual al stock mínimo.
+     * @return Lista de productos críticos.
+     */
+    List<Producto> listarProductosConStockBajo();
 }

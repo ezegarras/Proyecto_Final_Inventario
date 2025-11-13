@@ -197,4 +197,37 @@ public boolean eliminar(int idProducto) {
         return false;
     }
 }
+
+@Override
+    public List<Producto> listarProductosConStockBajo() {
+        List<Producto> productos = new ArrayList<>();
+        // Unimos con Categoría para tener el nombre
+        String sql = "SELECT p.*, c.nombre AS nombre_categoria " +
+                     "FROM Producto p " +
+                     "JOIN Categoria c ON p.id_categoria = c.id_categoria " +
+                     "WHERE p.stock_actual <= p.stock_minimo " +
+                     "ORDER BY p.stock_actual ASC"; // Mostrar los más críticos primero
+        
+        try (Connection con = ConexionBD.getConexion();
+             PreparedStatement ps = con.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            
+            while (rs.next()) {
+                // (Reutilizamos el método mapResultSetToProducto si lo tuvieras,
+                // o lo mapeamos manualmente)
+                Producto p = new Producto();
+                p.setIdProducto(rs.getInt("id_producto"));
+                p.setNombre(rs.getString("nombre"));
+                p.setPrecioUnitario(rs.getDouble("precio_unitario"));
+                p.setStockActual(rs.getInt("stock_actual"));
+                p.setStockMinimo(rs.getInt("stock_minimo"));
+                p.setIdCategoria(rs.getInt("id_categoria"));
+                p.setNombreCategoria(rs.getString("nombre_categoria"));
+                productos.add(p);
+            }
+        } catch (SQLException e) {
+            System.err.println("Error al listar productos con stock bajo: " + e.getMessage());
+        }
+        return productos;
+    }
     }

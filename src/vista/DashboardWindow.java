@@ -19,6 +19,8 @@ import java.awt.Dimension;
 import dao.*;
 import modelo.Usuario;
 import utils.DataUpdateNotifier;
+import vista.HomePanel;
+import controlador.HomeController;
 
 /**
  *
@@ -61,7 +63,6 @@ public class DashboardWindow extends JFrame {
                            ISalidaDAO sDAO, IUsuarioDAO uDAO, IRolDAO rDAO, DataUpdateNotifier notifier) {
 
         this.usuario = usuario;
-        // Guardamos todos los DAOs
         this.productoDAO = pDAO;
         this.categoriaDAO = cDAO;
         this.proveedorDAO = provDAO;
@@ -78,10 +79,9 @@ public class DashboardWindow extends JFrame {
 }
     
     private void initializeComponents(Usuario usuario) {
-        // cabeceras
+       
         lblSaludo = StyleManager.createLabel("Hola, " + usuario.getNombre() + " (Perfil: " + usuario.getUsuario() + ")");
         btnCerrarSesion = StyleManager.createPrimaryButton("Cerrar Sesión");
-        // (Estilo rojo para 'Cerrar Sesión')
         btnCerrarSesion.setBackground(new Color(211, 47, 47));
 
         // Menu
@@ -103,7 +103,7 @@ public class DashboardWindow extends JFrame {
         
         setLayout(new BorderLayout());
         
-        // Header
+       
         panelHeader = new JPanel(new BorderLayout(10, 10));
         panelHeader.setBackground(Color.WHITE);
         panelHeader.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
@@ -111,7 +111,7 @@ public class DashboardWindow extends JFrame {
         panelHeader.add(btnCerrarSesion, BorderLayout.EAST);
         add(panelHeader, BorderLayout.NORTH);
 
-        // Menú
+        
         panelMenu = new JPanel(new GridLayout(8, 1, 0, 10)); 
         panelMenu.setBackground(new Color(51, 51, 51));
         panelMenu.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
@@ -129,12 +129,15 @@ public class DashboardWindow extends JFrame {
         }
         add(panelMenu, BorderLayout.WEST);
 
-        // 
+        
         panelContent.setBackground(StyleManager.GRIS_CLARO);
         
-        panelContent.add(new HomePanel(), "home"); 
+        vista.HomePanel panelHome = new vista.HomePanel();
+        controlador.HomeController homeController = new controlador.HomeController(panelHome, this.productoDAO, this.salidaDAO);
+        this.notifier.addListener(homeController);
+        panelContent.add(panelHome, "home");
  
-        // ------------------------
+      
         
         vista.InventarioPanel panelInventario = new vista.InventarioPanel();
         new controlador.InventarioController(panelInventario, this.productoDAO, this.usuario, this.notifier);
@@ -160,6 +163,10 @@ public class DashboardWindow extends JFrame {
         vista.UsuariosPanel panelUsuarios = new vista.UsuariosPanel();
         new controlador.UsuariosController(panelUsuarios, this.usuarioDAO, this.rolDAO, this.notifier);
         panelContent.add(panelUsuarios, "usuarios");
+        
+        vista.ReportesPanel panelReportes = new vista.ReportesPanel();
+        new controlador.ReportesController(panelReportes, this.productoDAO, this.salidaDAO);
+        panelContent.add(panelReportes, "reportes");
         
         add(panelContent, BorderLayout.CENTER);
         

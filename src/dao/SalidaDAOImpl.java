@@ -18,10 +18,45 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import modelo.Factura;
+import modelo.Producto;
 import modelo.Salida;
 import utils.ConexionBD;
+import java.util.Date;
+import modelo.VentaDiariaDTO;
 
 public class SalidaDAOImpl implements ISalidaDAO {
+    
+    @Override
+    public List<Producto> listarProductosMasVendidos(int limite) {
+    List<Producto> productos = new ArrayList<>();
+    // Esta consulta agrupa por producto, suma las cantidades vendidas
+    // y se une a la tabla Producto para obtener el nombre.
+    String sql = "SELECT p.id_producto, p.nombre, SUM(s.cantidad) AS total_vendido " +
+                 "FROM Salida s " +
+                 "JOIN Producto p ON s.id_producto = p.id_producto " +
+                 "GROUP BY p.id_producto, p.nombre " +
+                 "ORDER BY total_vendido DESC " +
+                 "LIMIT ?";
+
+    try (Connection con = ConexionBD.getConexion();
+         PreparedStatement ps = con.prepareStatement(sql)) {
+
+        ps.setInt(1, limite);
+
+        try (ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                Producto p = new Producto();
+                p.setIdProducto(rs.getInt("id_producto"));
+                p.setNombre(rs.getString("nombre"));
+                p.setTotalVendido(rs.getInt("total_vendido"));
+                productos.add(p);
+            }
+        }
+    } catch (SQLException e) {
+        System.err.println("Error al listar productos más vendidos: " + e.getMessage());
+    }
+    return productos;
+    }
 
     @Override
     public boolean registrarVenta(Factura factura, List<Salida> detalle) {
@@ -133,5 +168,34 @@ public class SalidaDAOImpl implements ISalidaDAO {
             System.err.println("Error al listar últimas facturas: " + e.getMessage());
         }
         return facturas;
+    }
+    
+    
+    @Override
+    public List<VentaDiariaDTO> getVentasUltimos7Dias() {
+    List<VentaDiariaDTO> ventas = new ArrayList<>();
+    // Suma las cantidades de la tabla Salida, agrupadas por fecha de Factura,
+    // de los últimos 7 días (incluyendo hoy).
+    String sql = "SELECT DATE(f.fecha) AS dia, SUM(s.cantidad) AS total_vendido " +
+                 "FROM Factura f " +
+                 "JOIN Salida s ON f.id_factura = s.id_factura " +
+                 "WHERE f.fecha >= CURDATE() - INTERVAL 6 DAY " +
+                 "GROUP BY DATE(f.fecha) " +
+                 "ORDER BY dia ASC";
+
+    try (Connection con = ConexionBD.getConexion();
+         PreparedStatement ps = con.prepareStatement(sql);
+         ResultSet rs = ps.executeQuery()) {
+
+        while (rs.next()) {
+            VentaDiariaDTO dia = new VentaDiariaDTO();
+            dia.setFecha(rs.getDate("dia")); // java.sql.Date es compatible con java.util.Date
+            dia.setTotalVendido(rs.getInt("total_vendido"));
+            ventas.add(dia);
+        }
+    } catch (SQLException e) {
+        System.err.println("Error al obtener ventas diarias: " + e.getMessage());
+    }
+    return ventas;
     }
 }

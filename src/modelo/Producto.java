@@ -17,8 +17,9 @@ public class Producto {
     private int stockMinimo;
     private int idCategoria;
     
-    // Campo extra para el JOIN (no está en la tabla 'producto')
+    
     private String nombreCategoria; 
+    private int totalVendido;
 
     // Getters y Setters
     public int getIdProducto() { return idProducto; }
@@ -33,6 +34,8 @@ public class Producto {
     public void setStockMinimo(int stockMinimo) { this.stockMinimo = stockMinimo; }
     public int getIdCategoria() { return idCategoria; }
     public void setIdCategoria(int idCategoria) { this.idCategoria = idCategoria; }
+    public int getTotalVendido() { return totalVendido; }
+    public void setTotalVendido(int totalVendido) { this.totalVendido = totalVendido; }
     
     // Getter/Setter para el campo del JOIN
     public String getNombreCategoria() { return nombreCategoria; }

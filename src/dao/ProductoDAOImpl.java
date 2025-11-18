@@ -22,6 +22,78 @@ import utils.ConexionBD;
 public class ProductoDAOImpl implements IProductoDAO {
     
     @Override
+    public List<Producto> listarParaCombos() {
+        List<Producto> productos = new ArrayList<>();
+        // Traemos solo lo necesario para el combo de ventas
+        String sql = "SELECT id_producto, nombre, stock_actual, precio_unitario " +
+                     "FROM Producto " +
+                     "WHERE stock_actual > 0 " + // Opcional: solo mostrar productos con stock
+                     "ORDER BY nombre ASC";
+        
+        try (Connection con = ConexionBD.getConexion();
+             PreparedStatement ps = con.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            
+            while (rs.next()) {
+                Producto p = new Producto();
+                p.setIdProducto(rs.getInt("id_producto"));
+                p.setNombre(rs.getString("nombre"));
+                p.setStockActual(rs.getInt("stock_actual"));
+                p.setPrecioUnitario(rs.getDouble("precio_unitario"));
+                productos.add(p);
+            }
+        } catch (SQLException e) {
+            System.err.println("Error al listar productos para combos: " + e.getMessage());
+        }
+        return productos;
+    }
+    
+    @Override
+    public int contarProductos(String busqueda, boolean soloStockBajo) {
+    // Esta consulta debe tener EXACTAMENTE los mismos JOIN y WHERE
+    // que listarProductos, pero solo cuenta.
+
+    StringBuilder sql = new StringBuilder(
+        "SELECT COUNT(p.id_producto) " +
+        "FROM Producto p " +
+        "JOIN Categoria c ON p.id_categoria = c.id_categoria "
+    );
+
+    List<Object> params = new ArrayList<>();
+    boolean hasWhere = false;
+
+    if (busqueda != null && !busqueda.trim().isEmpty()) {
+        sql.append(" WHERE (p.nombre LIKE ? OR c.nombre LIKE ?)");
+        String busquedaLike = "%" + busqueda.trim() + "%";
+        params.add(busquedaLike);
+        params.add(busquedaLike);
+        hasWhere = true;
+    }
+
+    if (soloStockBajo) {
+        sql.append(hasWhere ? " AND " : " WHERE ");
+        sql.append("p.stock_actual <= p.stock_minimo");
+    }
+
+    try (Connection con = ConexionBD.getConexion();
+         PreparedStatement ps = con.prepareStatement(sql.toString())) {
+
+        for (int i = 0; i < params.size(); i++) {
+            ps.setObject(i + 1, params.get(i));
+        }
+
+        try (ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                return rs.getInt(1); // Devuelve el conteo
+            }
+        }
+    } catch (SQLException e) {
+        System.err.println("Error al contar productos: " + e.getMessage());
+    }
+    return 0;
+    }
+    
+    @Override
     public int insertar(Producto producto) {
         String sql = "INSERT INTO Producto (nombre, precio_unitario, stock_actual, " +
                      "stock_minimo, id_categoria) VALUES (?, ?, ?, ?, ?)";
@@ -56,42 +128,42 @@ public class ProductoDAOImpl implements IProductoDAO {
     }
 
 @Override
-public List<Producto> listarProductos(String busqueda, boolean soloStockBajo) {
+public List<Producto> listarProductos(String busqueda, boolean soloStockBajo, int pagina, int tamanoPagina) {
     List<Producto> productos = new ArrayList<>();
+    int offset = (pagina - 1) * tamanoPagina;
 
     // Construimos una consulta SQL dinámica
     StringBuilder sql = new StringBuilder(
         "SELECT p.*, c.nombre AS nombre_categoria " +
         "FROM Producto p " +
-        "JOIN Categoria c ON p.id_categoria = c.id_categoria "
+        "JOIN Categoria c ON p.id_categoria = c.id_categoria " 
     );
 
     List<Object> params = new ArrayList<>(); 
-
-    
     boolean hasWhere = false;
 
     if (busqueda != null && !busqueda.trim().isEmpty()) {
         sql.append(" WHERE (p.nombre LIKE ? OR c.nombre LIKE ?)");
         String busquedaLike = "%" + busqueda.trim() + "%";
         params.add(busquedaLike);
-        params.add(busquedaLike);
+        params.add(busquedaLike);        
         hasWhere = true;
     }
 
     if (soloStockBajo) {
         sql.append(hasWhere ? " AND " : " WHERE ");
         sql.append("p.stock_actual <= p.stock_minimo");
-        hasWhere = true; // No es necesario, pero es buena práctica
+        hasWhere = true;
     }
 
     sql.append(" ORDER BY p.id_producto");
-
+    sql.append(" LIMIT ? OFFSET ?");
+    params.add(tamanoPagina);
+    params.add(offset);
     
     try (Connection con = ConexionBD.getConexion();
          PreparedStatement ps = con.prepareStatement(sql.toString())) {
 
-        // 3. Asignar los parámetros dinámicos
         for (int i = 0; i < params.size(); i++) {
             ps.setObject(i + 1, params.get(i));
         }
@@ -174,9 +246,7 @@ public List<Producto> listarProductos(String busqueda, boolean soloStockBajo) {
 
 @Override
 public boolean eliminar(int idProducto) {
-    // NOTA: Primero deberíamos verificar si el producto tiene
-    // salidas o entradas (integridad referencial).
-    // Por ahora, lo borraremos directamente.
+
     String sql = "DELETE FROM Producto WHERE id_producto = ?";
 
     try (Connection con = ConexionBD.getConexion();
@@ -188,8 +258,7 @@ public boolean eliminar(int idProducto) {
 
     } catch (SQLException e) {
         System.err.println("Error al eliminar producto: " + e.getMessage());
-        // Manejar error de integridad referencial (si el producto está en una 'Salida')
-        if (e.getErrorCode() == 1451) { // Código de error MySQL para FK constraint
+        if (e.getErrorCode() == 1451) {
             javax.swing.JOptionPane.showMessageDialog(null, 
                 "No se puede eliminar el producto porque tiene ventas (salidas) registradas.",
                 "Error de Borrado", JOptionPane.ERROR_MESSAGE);
@@ -201,7 +270,7 @@ public boolean eliminar(int idProducto) {
 @Override
     public List<Producto> listarProductosConStockBajo() {
         List<Producto> productos = new ArrayList<>();
-        // Unimos con Categoría para tener el nombre
+        
         String sql = "SELECT p.*, c.nombre AS nombre_categoria " +
                      "FROM Producto p " +
                      "JOIN Categoria c ON p.id_categoria = c.id_categoria " +
@@ -213,8 +282,6 @@ public boolean eliminar(int idProducto) {
              ResultSet rs = ps.executeQuery()) {
             
             while (rs.next()) {
-                // (Reutilizamos el método mapResultSetToProducto si lo tuvieras,
-                // o lo mapeamos manualmente)
                 Producto p = new Producto();
                 p.setIdProducto(rs.getInt("id_producto"));
                 p.setNombre(rs.getString("nombre"));

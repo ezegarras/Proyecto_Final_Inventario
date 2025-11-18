@@ -7,6 +7,7 @@ package vista;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
+import java.awt.GridLayout;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import utils.StyleManager;
@@ -19,7 +20,8 @@ public class ReportesPanel extends JPanel {
     private JComboBox<String> cmbTipoReporte;
     private JTable tblReporte;
     private DefaultTableModel modeloTabla;
-    private JButton btnGenerarReporte; // (Lo usaremos después)
+    private JButton btnGenerarReporte;
+    private JPanel panelContenedorGrafico;
 
     public ReportesPanel() {
         setLayout(new BorderLayout(10, 10));
@@ -40,7 +42,8 @@ public class ReportesPanel extends JPanel {
         String[] tipos = {
             "- Seleccione un reporte -", 
             "Productos con Stock bajo",
-            "Productos más vendidos"
+            "Productos más vendidos",
+            "Ventas por Cliente"
         
         };
         cmbTipoReporte = new JComboBox<>(tipos);
@@ -51,6 +54,9 @@ public class ReportesPanel extends JPanel {
         panelNorte.setOpaque(false);
         panelNorte.add(lblTitulo, BorderLayout.NORTH);
         panelNorte.add(panelFiltros, BorderLayout.SOUTH);
+        
+        JPanel panelContenido = new JPanel(new GridLayout(1, 2, 10, 10)); // 1 fila, 2 cols
+        panelContenido.setOpaque(false);
  
         modeloTabla = new DefaultTableModel() {
             @Override
@@ -60,10 +66,30 @@ public class ReportesPanel extends JPanel {
         tblReporte.setRowHeight(25);
         tblReporte.getTableHeader().setFont(StyleManager.FONT_BOTON);
         JScrollPane scrollPane = new JScrollPane(tblReporte);
+        
+        panelContenedorGrafico = new JPanel(new BorderLayout());
+        panelContenedorGrafico.setOpaque(false);
+        panelContenedorGrafico.setBorder(BorderFactory.createTitledBorder("Visualización"));
+        panelContenedorGrafico.add(new JLabel("(Gráfico se mostrará aquí)", SwingConstants.CENTER));
 
+        panelContenido.add(scrollPane);
+        panelContenido.add(panelContenedorGrafico);
+        
         
         add(panelNorte, BorderLayout.NORTH);
-        add(scrollPane, BorderLayout.CENTER);
+        add(panelContenido, BorderLayout.CENTER);
+    }
+    
+    public void setGrafico(JPanel graficoPanel) {
+    panelContenedorGrafico.removeAll();
+    if (graficoPanel != null) {
+        panelContenedorGrafico.add(graficoPanel, BorderLayout.CENTER);
+    } else {
+        // Mostrar texto por defecto si no hay gráfico
+        panelContenedorGrafico.add(new JLabel("(Gráfico no disponible)", SwingConstants.CENTER));
+    }
+    panelContenedorGrafico.revalidate();
+    panelContenedorGrafico.repaint();
     }
 
     public JComboBox<String> getCmbTipoReporte() { return cmbTipoReporte; }

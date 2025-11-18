@@ -26,6 +26,9 @@ public class InventarioPanel extends JPanel {
     private JButton btnEliminar;
     private JPanel panelPaginacion;
     private static final int COLUMNA_PRECIO = 3;
+    private JButton btnAnterior;
+    private JButton btnSiguiente;
+    private JLabel lblPaginacion;
 
     public InventarioPanel() {
         // Configuración del Panel Principal
@@ -45,6 +48,10 @@ public class InventarioPanel extends JPanel {
         btnEliminar = StyleManager.createPrimaryButton("Eliminar Producto");
         btnEliminar.setBackground(new java.awt.Color(211, 47, 47));
         btnEliminar.setVisible(false);
+        
+        btnAnterior = new JButton("<< Anterior");
+        btnSiguiente = new JButton("Siguiente >>");
+        lblPaginacion = StyleManager.createLabel("Página 1 de 1");
         JLabel lblTitulo = StyleManager.createLabel("Gestión de Productos");
         lblTitulo.setFont(StyleManager.FONT_TITULO);
         
@@ -81,9 +88,22 @@ public class InventarioPanel extends JPanel {
         panelNorte.add(lblTitulo, BorderLayout.NORTH);
         panelNorte.add(panelFiltros, BorderLayout.CENTER);
         
-        JPanel panelAcciones = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        JPanel panelAcciones = new JPanel(new BorderLayout());
         panelAcciones.setOpaque(false);
-        panelAcciones.add(btnEliminar);
+
+        JPanel panelBotonesAccion = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        panelBotonesAccion.setOpaque(false);
+        panelBotonesAccion.add(btnEliminar);
+        // (Añadiremos el botón Editar aquí luego)
+
+        JPanel panelPaginador = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        panelPaginador.setOpaque(false);
+        panelPaginador.add(btnAnterior);
+        panelPaginador.add(lblPaginacion);
+        panelPaginador.add(btnSiguiente);
+
+        panelAcciones.add(panelBotonesAccion, BorderLayout.WEST);
+        panelAcciones.add(panelPaginador, BorderLayout.EAST);
         
         
 
@@ -101,4 +121,7 @@ public class InventarioPanel extends JPanel {
     public JTextField getTxtBuscarProducto() { return txtBuscarProducto; }
     public JCheckBox getChkStockBajo() { return chkStockBajo; }
     public JButton getBtnEliminar() { return btnEliminar;}
+    public JButton getBtnAnterior() { return btnAnterior; }
+    public JButton getBtnSiguiente() { return btnSiguiente; }
+    public JLabel getLblPaginacion() { return lblPaginacion; }
 }

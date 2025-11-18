@@ -27,6 +27,7 @@ import vista.SalidasPanel;
 import utils.DataUpdateListener;
 import utils.DataUpdateNotifier;
 
+
 public class SalidasController implements DataUpdateListener {
     
     private final SalidasPanel vista;
@@ -75,7 +76,7 @@ public class SalidasController implements DataUpdateListener {
     });
 
     // Cargamos los productos
-    List<Producto> productos = productoDAO.listarProductos("", false); // Trae todos
+    List<Producto> productos = productoDAO.listarParaCombos();
     DefaultComboBoxModel<Producto> model = new DefaultComboBoxModel<>();
     model.addElement(null); // Opción "Seleccione..."
     for (Producto p : productos) {
@@ -87,11 +88,11 @@ public class SalidasController implements DataUpdateListener {
     private void inicializar() {
         cargarHistorial();
         cargarComboProductos();
-       
+        
+        vista.getSpinFechaVenta().setValue(new Date());
         vista.getBtnBuscarCliente().addActionListener(e -> buscarCliente());
         vista.getBtnAgregarAlCarrito().addActionListener(e -> agregarAlCarrito());
         vista.getBtnRegistrarVenta().addActionListener(e -> registrarVenta());
-        
         
         vista.getTblCarrito().addMouseListener(new MouseAdapter() {
             @Override
@@ -209,7 +210,7 @@ public class SalidasController implements DataUpdateListener {
         
         Factura factura = new Factura();
         factura.setIdCliente(clienteActual.getIdCliente());
-        factura.setFecha(new Date()); 
+        factura.setFecha((Date) vista.getSpinFechaVenta().getValue());
         factura.setNumeroFactura(generarNumeroFactura()); 
         factura.setSubtotal(subtotal);
         factura.setIgv(igv);
@@ -236,6 +237,7 @@ public class SalidasController implements DataUpdateListener {
         vista.getLblNombreCliente().setText("Cliente: (No seleccionado)");
         vista.getTxtBuscarClienteDNI().setText("");
         vista.getCmbProductoVenta().setSelectedIndex(0);
+        vista.getSpinFechaVenta().setValue(new Date());
         actualizarTotal();
         
     }

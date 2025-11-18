@@ -15,6 +15,8 @@ import modelo.Factura;
 import modelo.Producto;
 import modelo.Salida;
 import modelo.VentaDiariaDTO;
+import modelo.CategoriaVentaDTO;
+import modelo.ClienteReporteDTO;
 
 public interface ISalidaDAO {
     
@@ -24,8 +26,17 @@ public interface ISalidaDAO {
     
     //Obtiene una lista de productos ordenados por la cantidad total vendida
     List<Producto> listarProductosMasVendidos(int limite);
-    
-    
+   
     //Obtiene la suma de cantidades vendidas por día de los últimos 7 días.
     List<VentaDiariaDTO> getVentasUltimos7Dias();
+    
+     //Obtiene la suma de cantidades vendidas agrupadas por categoría.
+    List<CategoriaVentaDTO> getVentasPorCategoria();
+    
+    /**
+     * Obtiene el total de compras y el monto total gastado, 
+     * agrupado por cliente.
+     * @return Lista de DTOs para el reporte.
+     */
+    List<ClienteReporteDTO> getReporteVentasPorCliente();
 }

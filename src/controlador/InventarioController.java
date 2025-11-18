@@ -29,6 +29,9 @@ public class InventarioController implements DataUpdateListener{
     private final DefaultTableModel modeloTabla;
     private final Usuario usuario;
     private final DataUpdateNotifier notifier;
+    private static final int TAMANO_PAGINA = 20;
+    private int paginaActual = 1;
+    private int totalPaginas = 1;
 
     public InventarioController(InventarioPanel vista, IProductoDAO dao, Usuario usuario, DataUpdateNotifier notifier) {
     this.vista = vista;
@@ -43,18 +46,21 @@ public class InventarioController implements DataUpdateListener{
     this.notifier.addListener(this);
 }
     
-    private void inicializar() {
+    private void inicializar() {    
  
     cargarDatosTabla();
 
   
     vista.getTxtBuscarProducto().getDocument().addDocumentListener(new javax.swing.event.DocumentListener() {
-        @Override public void insertUpdate(javax.swing.event.DocumentEvent e) { cargarDatosTabla(); }
-        @Override public void removeUpdate(javax.swing.event.DocumentEvent e) { cargarDatosTabla(); }
-        @Override public void changedUpdate(javax.swing.event.DocumentEvent e) { cargarDatosTabla(); }
+    @Override public void insertUpdate(javax.swing.event.DocumentEvent e) { resetearPaginacionYRecargar(); }
+    @Override public void removeUpdate(javax.swing.event.DocumentEvent e) { resetearPaginacionYRecargar(); }
+    @Override public void changedUpdate(javax.swing.event.DocumentEvent e) { resetearPaginacionYRecargar(); }
     });
 
-    vista.getChkStockBajo().addActionListener(e -> cargarDatosTabla());
+    vista.getChkStockBajo().addActionListener(e -> resetearPaginacionYRecargar());
+    //vista.getChkStockBajo().addActionListener(e -> cargarDatosTabla());
+    vista.getBtnAnterior().addActionListener(e -> paginaAnterior());
+    vista.getBtnSiguiente().addActionListener(e -> paginaSiguiente());
 
    
     if (usuario.getRolNombre().equals("Administrador")) {
@@ -74,25 +80,25 @@ public class InventarioController implements DataUpdateListener{
     } else {
         
         vista.getBtnEliminar().setVisible(false);
+        }
     }
-
-
-  
-}
     
     private void cargarDatosTabla() {
-        
-    // Obtener valores de los filtros
+   
     String busqueda = vista.getTxtBuscarProducto().getText();
     boolean soloStockBajo = vista.getChkStockBajo().isSelected();
+    
+    int totalRegistros = dao.contarProductos(busqueda, soloStockBajo);
 
-    // Limpiar tabla
+    totalPaginas = (int) Math.ceil((double) totalRegistros / TAMANO_PAGINA);
+    if (totalPaginas == 0) totalPaginas = 1; 
+    if (paginaActual > totalPaginas) {
+        paginaActual = totalPaginas;
+    }
+
     modeloTabla.setRowCount(0);
+    List<Producto> lista = dao.listarProductos(busqueda, soloStockBajo, paginaActual, TAMANO_PAGINA);
 
-    //  Pedir datos al DAO 
-    List<Producto> lista = dao.listarProductos(busqueda, soloStockBajo);
-
-    // Llena la tabla
     for (Producto p : lista) {
         Object[] fila = new Object[6];
         fila[0] = p.getIdProducto();
@@ -104,7 +110,36 @@ public class InventarioController implements DataUpdateListener{
 
         modeloTabla.addRow(fila);
     }
-}
+    actualizarControlesPaginacion();
+    }
+    
+    /**
+    * Actualiza el label "habilita/deshabilita los botones.
+    */
+    private void actualizarControlesPaginacion() {
+        vista.getLblPaginacion().setText("Página " + paginaActual + " de " + totalPaginas);
+        vista.getBtnAnterior().setEnabled(paginaActual > 1);
+        vista.getBtnSiguiente().setEnabled(paginaActual < totalPaginas);
+    }
+
+    private void paginaAnterior() {
+        if (paginaActual > 1) {
+            paginaActual--;
+            cargarDatosTabla();
+        }
+    }
+
+    private void paginaSiguiente() {
+        if (paginaActual < totalPaginas) {
+            paginaActual++;
+            cargarDatosTabla();
+        }
+    }
+
+    private void resetearPaginacionYRecargar() {
+        paginaActual = 1;
+        cargarDatosTabla();
+    }
     
     private void eliminarProductoSeleccionado() {
     
@@ -173,6 +208,6 @@ private void abrirDialogoEditar() {
 @Override
 public void onDataChanged() {
     System.out.println("InventarioController: ¡Datos cambiaron! Recargando tabla...");
-    cargarDatosTabla();
+    resetearPaginacionYRecargar();
 }
 }

@@ -11,17 +11,40 @@ import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.data.category.DefaultCategoryDataset;
+import org.jfree.data.general.DefaultPieDataset;
+import org.jfree.data.general.PieDataset;
 
 
-public class GraficoService {
+    public class GraficoService {
 
-    public static JPanel crearGraficoBarras(DefaultCategoryDataset dataset) {
+    public static JPanel crearGraficoCircular(PieDataset dataset, String titulo) {
+
+    
+    JFreeChart chart = ChartFactory.createPieChart(
+        titulo,
+        dataset,
+        true,  // Leyenda (true)
+        true,  // Tooltips (true)
+        false  // URLs (false)
+    );
+
+    
+    chart.setBackgroundPaint(java.awt.Color.WHITE);
+
+    
+    ChartPanel chartPanel = new ChartPanel(chart);
+    chartPanel.setPreferredSize(new Dimension(300, 250)); 
+
+    return chartPanel;
+    }
+
+    public static JPanel crearGraficoBarras(DefaultCategoryDataset dataset, String titulo, String ejeX, String ejeY) {
        
         JFreeChart chart = ChartFactory.createBarChart(
-            "Ventas de la Semana",  // Título
-            "Día",                  // Etiqueta Eje X
-            "Cantidad Vendida",     // Etiqueta Eje Y
-            dataset,                // Datos
+            titulo, 
+            ejeX,   
+            ejeY,   
+            dataset, 
             PlotOrientation.VERTICAL,
             false,                  // Leyenda 
             true,                   // Tooltips

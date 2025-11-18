@@ -47,7 +47,7 @@ public class DashboardWindow extends JFrame {
     private JButton btnNavUsuarios;
     private Usuario usuario;
     private CardLayout cardLayout; 
-    
+
     private final IProductoDAO productoDAO;
     private final ICategoriaDAO categoriaDAO;
     private final IProveedorDAO proveedorDAO;
@@ -133,7 +133,7 @@ public class DashboardWindow extends JFrame {
         panelContent.setBackground(StyleManager.GRIS_CLARO);
         
         vista.HomePanel panelHome = new vista.HomePanel();
-        controlador.HomeController homeController = new controlador.HomeController(panelHome, this.productoDAO, this.salidaDAO);
+        controlador.HomeController homeController = new controlador.HomeController(panelHome, this.productoDAO, this.salidaDAO, this.entradaDAO);
         this.notifier.addListener(homeController);
         panelContent.add(panelHome, "home");
  
@@ -159,7 +159,6 @@ public class DashboardWindow extends JFrame {
         new controlador.SalidasController(panelSalidas, this.clienteDAO, this.productoDAO, this.salidaDAO, this.notifier);
         panelContent.add(panelSalidas, "salidas");
         
-        //Modulo usuario
         vista.UsuariosPanel panelUsuarios = new vista.UsuariosPanel();
         new controlador.UsuariosController(panelUsuarios, this.usuarioDAO, this.rolDAO, this.notifier);
         panelContent.add(panelUsuarios, "usuarios");

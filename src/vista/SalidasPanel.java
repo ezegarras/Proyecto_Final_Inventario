@@ -27,6 +27,7 @@ public class SalidasPanel extends JPanel {
     private JTextField txtBuscarClienteDNI;
     private JButton btnBuscarCliente;
     private JLabel lblNombreCliente;
+    private JSpinner spinFechaVenta;
     private JComboBox<Producto> cmbProductoVenta; 
     private JSpinner spinCantidadProducto;
     private JButton btnAgregarAlCarrito;
@@ -66,6 +67,11 @@ public class SalidasPanel extends JPanel {
         txtBuscarClienteDNI.setPreferredSize(new Dimension(100, 30));
         btnBuscarCliente = new JButton("Buscar");
         lblNombreCliente = StyleManager.createLabel("Cliente: (No seleccionado)");
+        panelCliente.add(StyleManager.createLabel("Fecha Venta:"));
+        spinFechaVenta = new JSpinner(new SpinnerDateModel());
+        spinFechaVenta.setEditor(new JSpinner.DateEditor(spinFechaVenta, "dd/MM/yyyy HH:mm:ss")); // Formato con hora
+        spinFechaVenta.setPreferredSize(new Dimension(150, 30));
+        panelCliente.add(spinFechaVenta);
         lblNombreCliente.setFont(StyleManager.FONT_BOTON);
         
         panelCliente.add(txtBuscarClienteDNI);
@@ -146,4 +152,5 @@ public class SalidasPanel extends JPanel {
     public JLabel getLblTotalVenta() { return lblTotalVenta; }
     public JButton getBtnRegistrarVenta() { return btnRegistrarVenta; }
     public DefaultTableModel getModeloTablaHistorial() { return modeloTablaHistorial; }
+    public JSpinner getSpinFechaVenta() { return spinFechaVenta; }
 }

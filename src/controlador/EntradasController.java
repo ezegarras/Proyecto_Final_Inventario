@@ -74,7 +74,7 @@ public class EntradasController {
     
     private void cargarCombos() {
        
-        List<Producto> productos = productoDAO.listarProductos("", false); 
+        List<Producto> productos = productoDAO.listarParaCombos(); 
         DefaultComboBoxModel<Producto> modelProducto = new DefaultComboBoxModel<>();
         modelProducto.addElement(null); 
         for (Producto p : productos) {

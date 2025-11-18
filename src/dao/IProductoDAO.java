@@ -20,8 +20,16 @@ public interface IProductoDAO {
      * @param soloStockBajo Si es true, filtra por stock_actual <= stock_minimo.
      * @return Lista de productos filtrada.
      */
-    List<Producto> listarProductos(String busqueda, boolean soloStockBajo);
+    List<Producto> listarProductos(String busqueda, boolean soloStockBajo, int pagina, int tamanoPagina);
     
+    /**
+     * Cuenta el total de productos que coinciden con los filtros.
+     * @param busqueda Término de búsqueda (categoría).
+     * @param soloStockBajo Si es true, filtra por stock_actual <= stock_minimo.
+     * @return El conteo total de filas.
+     */
+    int contarProductos(String busqueda, boolean soloStockBajo);
+    List<Producto> listarParaCombos();
     /**
      * Elimina un producto de la base de datos usando su ID.
      * @param idProducto El ID del producto a eliminar.

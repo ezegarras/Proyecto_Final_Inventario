@@ -19,26 +19,29 @@ import utils.GraficoService;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
 import javax.swing.JPanel;
+import dao.IEntradaDAO;
+import modelo.Entrada;
+import java.text.SimpleDateFormat;
+import javax.swing.table.DefaultTableModel;
 
 /**
  *
  * @author Enrique Zegarra
  */
 
-/**
- * Controlador para el panel principal (Dashboard Widgets).
- */
 public class HomeController implements DataUpdateListener {
 
     private final HomePanel vista;
     private final IProductoDAO productoDAO;
     private final ISalidaDAO salidaDAO;
-    // (Necesitaremos ISalidaDAO para el gráfico de ventas después)
+    private final IEntradaDAO entradaDAO;
+  
 
-    public HomeController(HomePanel vista, IProductoDAO pDAO, ISalidaDAO sDAO) {
+    public HomeController(HomePanel vista, IProductoDAO pDAO, ISalidaDAO sDAO, IEntradaDAO eDAO) {
         this.vista = vista;
         this.productoDAO = pDAO;
         this.salidaDAO = sDAO;
+        this.entradaDAO = eDAO;
         
         cargarWidgets();
     }
@@ -47,16 +50,35 @@ public class HomeController implements DataUpdateListener {
         cargarWidgetStockTotal();
         cargarWidgetStockBajo();
         cargarGraficoVentas();
+        cargarWidgetEntradasRecientes();
+    }
+    
+    private void cargarWidgetEntradasRecientes() {
+    DefaultTableModel model = vista.getModeloTablaEntradas();
+    model.setRowCount(0);
+
+    List<Entrada> entradas = entradaDAO.listarUltimas(5); 
+
+    SimpleDateFormat formatFecha = new SimpleDateFormat("dd/MM/yyyy");
+
+    for (Entrada e : entradas) {
+        Object[] fila = new Object[4];
+        fila[0] = e.getNombreProducto();
+        fila[1] = e.getCantidad();
+        fila[2] = formatFecha.format(e.getFecha());
+        fila[3] = e.getNombreProveedor();
+        model.addRow(fila);
+        }
     }
     
     private void cargarGraficoVentas() {
-    // Obtener datos del DAO
+ 
     List<VentaDiariaDTO> ventas = salidaDAO.getVentasUltimos7Dias();
 
-    // Crea el dataset para JFreeChart
+ 
     DefaultCategoryDataset dataset = new DefaultCategoryDataset();
 
-    //  "Lun", "Mar", "Mié"
+
     SimpleDateFormat formatDia = new SimpleDateFormat("E", new Locale("es", "ES"));
 
     for (VentaDiariaDTO dia : ventas) {
@@ -64,16 +86,16 @@ public class HomeController implements DataUpdateListener {
         dataset.addValue(dia.getTotalVendido(), "Ventas", diaSemana);
     }
 
-    //Crea el gráfico usando el servicio
-    JPanel graficoPanel = GraficoService.crearGraficoBarras(dataset);
+    
+    JPanel graficoPanel = GraficoService.crearGraficoBarras(dataset, 
+    "Ventas de la Semana (Unidades)", "Día", "Cantidad Vendida");
 
-    //Inserta el gráfico en la vista
     vista.setGraficoVentas(graficoPanel);
     }
     
     private void cargarWidgetStockTotal() {
         
-        List<Producto> productos = productoDAO.listarProductos("", false);
+        List<Producto> productos = productoDAO.listarParaCombos();
         
         int totalUnidades = 0;
         double valorTotal = 0.0;

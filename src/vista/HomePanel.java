@@ -12,6 +12,7 @@ import java.awt.GridLayout;
 import java.util.Locale;
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
+import javax.swing.table.DefaultTableModel;
 import utils.StyleManager;
 import utils.GraficoService;
 
@@ -20,19 +21,19 @@ import utils.GraficoService;
  * @author Enrique Zegarra
  */
 
+//Widgets
 public class HomePanel extends JPanel {
 
-    //Widgets
+    
     private JLabel lblStockTotalValor;
     private JLabel lblStockTotalUnidades;
-    
-    
     private JList<String> listStockBajo;
     private DefaultListModel<String> modeloListaStockBajo;
-    
-   
     private JPanel panelContenedorGrafico;
-
+    private JTable tblEntradasRecientes;
+    private DefaultTableModel modeloTablaEntradas;
+    private JPanel panelGraficoVentas;
+    
     public HomePanel() {
         super(new BorderLayout(10, 10));
         setBackground(StyleManager.GRIS_CLARO);
@@ -61,9 +62,25 @@ public class HomePanel extends JPanel {
         panelSuperior.add(panelContenedorGrafico);
 
         add(panelSuperior, BorderLayout.NORTH);
-        // (Aquí iría el historial de entradas recientes del prototipo)
+     
+        // 4. Widget Entradas Recientes (CENTER)
+        String[] columnas = {"PRODUCTO", "CANTIDAD", "FECHA", "PROVEEDOR"};
+        modeloTablaEntradas = new DefaultTableModel(columnas, 0) {
+        @Override
+        public boolean isCellEditable(int row, int column) { return false; }
+        };
+        tblEntradasRecientes = new JTable(modeloTablaEntradas);
+        tblEntradasRecientes.setRowHeight(25);
+        tblEntradasRecientes.getTableHeader().setFont(StyleManager.FONT_BOTON);
+
+        JScrollPane scrollPane = new JScrollPane(tblEntradasRecientes);
+        scrollPane.setBorder(BorderFactory.createTitledBorder(
+            null, " Entradas Recientes ", TitledBorder.LEFT, TitledBorder.TOP, 
+            StyleManager.FONT_BOTON, StyleManager.TEXTO_NEGRO
+        ));
+        add(scrollPane, BorderLayout.CENTER);
+
     }
-    
     public void setGraficoVentas(JPanel graficoPanel) {
     panelContenedorGrafico.removeAll();
     panelContenedorGrafico.add(graficoPanel, BorderLayout.CENTER);
@@ -108,8 +125,6 @@ public class HomePanel extends JPanel {
         return panel;
     }
 
-    
-    
     public void setStockTotal(int unidades, double valor) {
         lblStockTotalUnidades.setText(String.valueOf(unidades));
         lblStockTotalValor.setText(String.format(new Locale("es", "PE"), "Valor total: S/ %,.2f", valor));
@@ -117,5 +132,9 @@ public class HomePanel extends JPanel {
     
     public DefaultListModel<String> getModeloListaStockBajo() {
         return modeloListaStockBajo;
+    }
+    
+    public DefaultTableModel getModeloTablaEntradas() {
+    return modeloTablaEntradas;
     }
 }

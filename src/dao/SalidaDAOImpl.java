@@ -10,6 +10,7 @@
 
 package dao;
 
+import modelo.CategoriaVentaDTO;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -23,8 +24,68 @@ import modelo.Salida;
 import utils.ConexionBD;
 import java.util.Date;
 import modelo.VentaDiariaDTO;
+import modelo.ClienteReporteDTO;
 
 public class SalidaDAOImpl implements ISalidaDAO {
+    
+    @Override
+    public List<ClienteReporteDTO> getReporteVentasPorCliente() {
+    List<ClienteReporteDTO> reporte = new ArrayList<>();
+    // Esta consulta une Factura y Cliente, agrupa por cliente,
+    // y cuenta las facturas (COUNT) y suma los totales (SUM).
+    String sql = "SELECT c.dni, c.nombre, " +
+                 "COUNT(f.id_factura) AS numero_compras, " +
+                 "SUM(f.total) AS monto_total " +
+                 "FROM Factura f " +
+                 "JOIN Cliente c ON f.id_cliente = c.id_cliente " +
+                 "GROUP BY c.id_cliente, c.dni, c.nombre " +
+                 "ORDER BY monto_total DESC"; // Ordena por los que más gastaron
+
+    try (Connection con = ConexionBD.getConexion();
+         PreparedStatement ps = con.prepareStatement(sql);
+         ResultSet rs = ps.executeQuery()) {
+
+        while (rs.next()) {
+            ClienteReporteDTO dto = new ClienteReporteDTO();
+            dto.setDni(rs.getString("dni"));
+            dto.setNombreCliente(rs.getString("nombre"));
+            dto.setNumeroCompras(rs.getInt("numero_compras"));
+            dto.setMontoTotal(rs.getDouble("monto_total"));
+            reporte.add(dto);
+        }
+    } catch (SQLException e) {
+        System.err.println("Error al obtener reporte de ventas por cliente: " + e.getMessage());
+    }
+    return reporte;
+    }
+    
+    
+    @Override
+    public List<CategoriaVentaDTO> getVentasPorCategoria() {
+    List<CategoriaVentaDTO> ventas = new ArrayList<>();
+    // Esta consulta une Salida -> Producto -> Categoria
+    String sql = "SELECT c.nombre AS categoria_nombre, SUM(s.cantidad) AS total_vendido " +
+                 "FROM Salida s " +
+                 "JOIN Producto p ON s.id_producto = p.id_producto " +
+                 "JOIN Categoria c ON p.id_categoria = c.id_categoria " +
+                 "GROUP BY c.nombre " +
+                 "ORDER BY total_vendido DESC";
+
+        try (Connection con = ConexionBD.getConexion();
+         PreparedStatement ps = con.prepareStatement(sql);
+         ResultSet rs = ps.executeQuery()) {
+
+        while (rs.next()) {
+            CategoriaVentaDTO dto = new CategoriaVentaDTO();
+            dto.setNombreCategoria(rs.getString("categoria_nombre"));
+            dto.setTotalVendido(rs.getInt("total_vendido"));
+            ventas.add(dto);
+        }
+    } catch (SQLException e) {
+        System.err.println("Error al obtener ventas por categoría: " + e.getMessage());
+    }
+    return ventas;
+    }
     
     @Override
     public List<Producto> listarProductosMasVendidos(int limite) {

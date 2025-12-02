@@ -26,6 +26,7 @@ import modelo.Salida;
 import vista.SalidasPanel;
 import utils.DataUpdateListener;
 import utils.DataUpdateNotifier;
+import utils.LogService;
 
 
 public class SalidasController implements DataUpdateListener {
@@ -58,14 +59,14 @@ public class SalidasController implements DataUpdateListener {
     
     
     private void cargarComboProductos() {
-    // Usamos el renderer que creamos para el panel de Entradas
+   
     vista.getCmbProductoVenta().setRenderer(new javax.swing.DefaultListCellRenderer() {
       
         @Override
         public java.awt.Component getListCellRendererComponent(javax.swing.JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
             super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
             if (value instanceof Producto) {
-                // Mostramos "Nombre (Stock: X)"
+               
                 Producto p = (Producto) value;
                 setText(p.getNombre() + " (Stock: " + p.getStockActual() + ")");
             } else {
@@ -78,7 +79,7 @@ public class SalidasController implements DataUpdateListener {
     // Cargamos los productos
     List<Producto> productos = productoDAO.listarParaCombos();
     DefaultComboBoxModel<Producto> model = new DefaultComboBoxModel<>();
-    model.addElement(null); // Opción "Seleccione..."
+    model.addElement(null);
     for (Producto p : productos) {
         model.addElement(p);
     }
@@ -220,6 +221,7 @@ public class SalidasController implements DataUpdateListener {
         boolean exito = salidaDAO.registrarVenta(factura, carrito);
         
         if (exito) {
+            LogService.info("Venta registrada. Factura: " + factura.getNumeroFactura() + " - Total: S/" + factura.getTotal());
             JOptionPane.showMessageDialog(vista, "Venta registrada exitosamente.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
             limpiarFormularioVenta();
             cargarHistorial();

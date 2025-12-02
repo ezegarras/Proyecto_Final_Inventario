@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import modelo.Entrada;
 import utils.ConexionBD;
+import utils.LogService;
 
 /**
  *
@@ -53,6 +54,7 @@ public class EntradaDAOImpl implements IEntradaDAO {
             
         } catch (SQLException e) {
             System.err.println("Error en la transacción de entrada: " + e.getMessage());
+            LogService.error("Error en la transacción de entrada: ", e);
             
             try {
                 if (con != null) {
@@ -60,6 +62,7 @@ public class EntradaDAOImpl implements IEntradaDAO {
                 }
             } catch (SQLException ex) {
                 System.err.println("Error al hacer rollback: " + ex.getMessage());
+                LogService.error("Error al hacer rollback: ", e);
             }
             return false;
         } finally {
@@ -71,6 +74,7 @@ public class EntradaDAOImpl implements IEntradaDAO {
                 }
             } catch (SQLException e) {
                 System.err.println("Error al restaurar auto-commit: " + e.getMessage());
+                LogService.error("Error al restaurar auto-commit: ", e);
             }
         }
     }
@@ -101,6 +105,7 @@ public class EntradaDAOImpl implements IEntradaDAO {
             }
         } catch (SQLException e) {
             System.err.println("Error al listar últimas entradas: " + e.getMessage());
+            LogService.error("Error al listar últimas entradas: ", e);
         }
         return entradas;
     }

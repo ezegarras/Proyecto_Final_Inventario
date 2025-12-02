@@ -13,6 +13,7 @@ import modelo.Usuario;
 import utils.NavigationManager;
 import vista.DashboardWindow;
 import utils.DataUpdateNotifier;
+import utils.LogService;
 
 /**
  *
@@ -69,7 +70,7 @@ public class LoginController {
         }
         
         if (usuario != null) {
-        // Crea la Vista y le pasa los DAOs
+        LogService.info("Login exitoso para el usuario: " + usuario.getUsuario() + " (" + usuario.getRolNombre() + ")");
         DashboardWindow dashboardView = new DashboardWindow(usuario, productoDAO, categoriaDAO, 
                                                 proveedorDAO, entradaDAO, clienteDAO, 
                                                 salidaDAO, usuarioDAO, rolDAO, notifier);
@@ -80,7 +81,7 @@ public class LoginController {
 
         NavigationManager.navigateTo(vista, dashboardView);
         } else {
-            
+            LogService.warning("Intento de login fallido para usuario: " + user);
             JOptionPane.showMessageDialog(vista, "Usuario o contraseña incorrectos.", "Error", JOptionPane.ERROR_MESSAGE);
         }
     }

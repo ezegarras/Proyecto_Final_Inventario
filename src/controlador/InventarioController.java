@@ -16,6 +16,7 @@ import javax.swing.SwingUtilities;
 import vista.ProductoDialog;
 import utils.DataUpdateListener;
 import utils.DataUpdateNotifier;
+import utils.LogService;
 
 /**
  *
@@ -166,6 +167,7 @@ public class InventarioController implements DataUpdateListener{
         boolean exito = dao.eliminar(idProducto);
 
         if (exito) {
+            LogService.warning("Producto eliminado. ID: " + idProducto);
             JOptionPane.showMessageDialog(vista, "Producto eliminado exitosamente.");
             cargarDatosTabla(); 
         }

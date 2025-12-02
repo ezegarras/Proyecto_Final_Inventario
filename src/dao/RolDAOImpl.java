@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import modelo.Rol;
 import utils.ConexionBD;
+import utils.LogService;
 
 /**
  *
@@ -32,6 +33,7 @@ public class RolDAOImpl implements IRolDAO {
             }
         } catch (SQLException e) {
             System.err.println("Error al listar roles: " + e.getMessage());
+            LogService.error("Error al listar roles: ", e);
         }
         return roles;
     }

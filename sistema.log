@@ -1,0 +1,14 @@
+nov. 24, 2025 8:32:45 P. M. utils.LogService info
+INFO: Login exitoso para el usuario: admin (Administrador)
+nov. 24, 2025 8:35:13 P. M. utils.LogService info
+INFO: Venta registrada. Factura: F001-1764034513 - Total: S/4019.2
+nov. 24, 2025 8:44:19 P. M. utils.LogService info
+INFO: Login exitoso para el usuario: ventas1 (Ventas)
+nov. 24, 2025 10:56:20 P. M. utils.LogService info
+INFO: Login exitoso para el usuario: admin (Administrador)
+dic. 01, 2025 8:06:48 P. M. utils.LogService info
+INFO: Login exitoso para el usuario: admin (Administrador)
+dic. 01, 2025 10:29:01 P. M. utils.LogService info
+INFO: Venta registrada. Factura: F001-1764646141 - Total: S/1700.0
+dic. 01, 2025 10:29:54 P. M. utils.LogService info
+INFO: Venta registrada. Factura: F001-1764646194 - Total: S/465.0

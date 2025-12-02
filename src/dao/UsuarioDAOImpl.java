@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import modelo.Usuario;
 import utils.ConexionBD;
+import utils.LogService;
 
 /**
  *
@@ -47,6 +48,7 @@ public class UsuarioDAOImpl implements IUsuarioDAO {
             
         } catch (SQLException e) {
             System.err.println("Error en el login: " + e.getMessage());
+             LogService.error("Error en el login: ", e);
         }
         
         return user;
@@ -71,6 +73,7 @@ public class UsuarioDAOImpl implements IUsuarioDAO {
             }
         } catch (SQLException e) {
             System.err.println("Error al listar usuarios: " + e.getMessage());
+             LogService.error("Error al listar usuarios: ", e);
         }
         return usuarios;
     }
@@ -87,6 +90,7 @@ public class UsuarioDAOImpl implements IUsuarioDAO {
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
             System.err.println("Error al insertar usuario: " + e.getMessage());
+             LogService.error("Error al insertar usuario: ", e);
             return false;
         }
     }
@@ -104,6 +108,7 @@ public class UsuarioDAOImpl implements IUsuarioDAO {
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
             System.err.println("Error al actualizar usuario: " + e.getMessage());
+             LogService.error("Error al actualizar usuario: ", e);
             return false;
         }
     }
@@ -117,6 +122,7 @@ public class UsuarioDAOImpl implements IUsuarioDAO {
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
             System.err.println("Error al eliminar usuario: " + e.getMessage());
+             LogService.error("Error al eliminar usuario: ", e);
             return false;
         }
     }

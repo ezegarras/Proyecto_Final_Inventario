@@ -25,6 +25,7 @@ import utils.ConexionBD;
 import java.util.Date;
 import modelo.VentaDiariaDTO;
 import modelo.ClienteReporteDTO;
+import utils.LogService;
 
 public class SalidaDAOImpl implements ISalidaDAO {
     
@@ -55,6 +56,7 @@ public class SalidaDAOImpl implements ISalidaDAO {
         }
     } catch (SQLException e) {
         System.err.println("Error al obtener reporte de ventas por cliente: " + e.getMessage());
+        LogService.error("Error al obtener reporte de ventas por cliente: ", e);
     }
     return reporte;
     }
@@ -83,6 +85,7 @@ public class SalidaDAOImpl implements ISalidaDAO {
         }
     } catch (SQLException e) {
         System.err.println("Error al obtener ventas por categoría: " + e.getMessage());
+        LogService.error("Error al obtener ventas por categoría: ", e);
     }
     return ventas;
     }
@@ -115,6 +118,7 @@ public class SalidaDAOImpl implements ISalidaDAO {
         }
     } catch (SQLException e) {
         System.err.println("Error al listar productos más vendidos: " + e.getMessage());
+        LogService.error("Error al listar productos más vendidos: ", e);
     }
     return productos;
     }
@@ -183,10 +187,12 @@ public class SalidaDAOImpl implements ISalidaDAO {
 
         } catch (SQLException e) {
             System.err.println("Error en la transacción de venta: " + e.getMessage());
+            LogService.error("Error en la transacción de venta: ", e);
             try {
                 if (con != null) con.rollback();
             } catch (SQLException ex) {
                 System.err.println("Error al hacer rollback: " + ex.getMessage());
+                LogService.error("Error al hacer rollback: ", e);
             }
             return false;
         } finally {
@@ -197,6 +203,7 @@ public class SalidaDAOImpl implements ISalidaDAO {
                 }
             } catch (SQLException e) {
                 System.err.println("Error al restaurar auto-commit: " + e.getMessage());
+                 LogService.error("Error al restaurar auto-commit: ", e);
             }
         }
     }
@@ -227,6 +234,7 @@ public class SalidaDAOImpl implements ISalidaDAO {
             }
         } catch (SQLException e) {
             System.err.println("Error al listar últimas facturas: " + e.getMessage());
+             LogService.error("Error al listar últimas facturas: ", e);
         }
         return facturas;
     }
@@ -256,6 +264,7 @@ public class SalidaDAOImpl implements ISalidaDAO {
         }
     } catch (SQLException e) {
         System.err.println("Error al obtener ventas diarias: " + e.getMessage());
+         LogService.error("Error al obtener ventas diarias: ", e);
     }
     return ventas;
     }

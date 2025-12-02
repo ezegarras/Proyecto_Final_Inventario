@@ -19,6 +19,7 @@ import java.util.List;
 import javax.swing.JOptionPane;
 import modelo.Cliente;
 import utils.ConexionBD;
+import utils.LogService;
 
 public class ClienteDAOImpl implements IClienteDAO {
 
@@ -33,7 +34,8 @@ public class ClienteDAOImpl implements IClienteDAO {
                 clientes.add(mapResultSetToCliente(rs));
             }
         } catch (SQLException e) {
-            System.err.println("Error al listar clientes: " + e.getMessage());
+            //System.err.println("Error al listar clientes: " + e.getMessage());
+            LogService.error("Error al listar clientes: ", e);
         }
         return clientes;
     }
@@ -53,7 +55,8 @@ public class ClienteDAOImpl implements IClienteDAO {
             ps.setString(7, c.getSexo());
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
-            System.err.println("Error al insertar cliente: " + e.getMessage());
+            //System.err.println("Error al insertar cliente: " + e.getMessage());
+            LogService.error("Error al insertar cliente: ", e);
             return false;
         }
     }
@@ -74,7 +77,8 @@ public class ClienteDAOImpl implements IClienteDAO {
             ps.setInt(8, c.getIdCliente());
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
-            System.err.println("Error al actualizar cliente: " + e.getMessage());
+            //System.err.println("Error al actualizar cliente: " + e.getMessage());
+            LogService.error("Error al actualizar cliente: ", e);
             return false;
         }
     }
@@ -88,6 +92,7 @@ public class ClienteDAOImpl implements IClienteDAO {
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
             System.err.println("Error al eliminar cliente: " + e.getMessage());
+            LogService.error("Error al eliminar cliente: ", e);
             if (e.getErrorCode() == 1451) {
                 JOptionPane.showMessageDialog(null, 
                     "No se puede eliminar. El cliente tiene facturas registradas.",
@@ -110,11 +115,12 @@ public class ClienteDAOImpl implements IClienteDAO {
             }
         } catch (SQLException e) {
             System.err.println("Error al buscar cliente por DNI: " + e.getMessage());
+            LogService.error("Error al buscar cliente por DNI: ", e);
         }
-        return null; // Si no lo encuentra regresa no encontrado
+        return null; 
     }
     
-    // Método helper privado para evitar repetir código (SRP)
+    // (SRP)
     private Cliente mapResultSetToCliente(ResultSet rs) throws SQLException {
         Cliente c = new Cliente();
         c.setIdCliente(rs.getInt("id_cliente"));

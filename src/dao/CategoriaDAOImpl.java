@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import modelo.Categoria;
 import utils.ConexionBD;
+import utils.LogService;
 
 /**
  *
@@ -36,7 +37,8 @@ public class CategoriaDAOImpl implements ICategoriaDAO {
                 categorias.add(cat);
             }
         } catch (SQLException e) {
-            System.err.println("Error al listar categorías: " + e.getMessage());
+            //System.err.println("Error al listar categorías: " + e.getMessage());
+            LogService.error("Error al listar categorías: ", e);
         }
         return categorias;
     }
@@ -51,7 +53,8 @@ public class CategoriaDAOImpl implements ICategoriaDAO {
             return ps.executeUpdate() > 0;
             
         } catch (SQLException e) {
-            System.err.println("Error al insertar categoría: " + e.getMessage());
+            //System.err.println("Error al insertar categoría: " + e.getMessage());
+            LogService.error("Error al insertar categoría: ", e);
             return false;
         }
     }

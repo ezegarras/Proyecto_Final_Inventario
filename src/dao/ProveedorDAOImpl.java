@@ -10,6 +10,7 @@ import java.util.List;
 import javax.swing.JOptionPane;
 import modelo.Proveedor;
 import utils.ConexionBD;
+import utils.LogService;
 
 /**
  *
@@ -32,11 +33,12 @@ public class ProveedorDAOImpl implements IProveedorDAO {
                 p.setIdProveedor(rs.getInt("id_proveedor"));
                 p.setRazonSocial(rs.getString("razon_social"));
                 p.setRuc(rs.getString("ruc"));
-                // (puedes añadir el resto de campos si los necesitas)
                 proveedores.add(p);
             }
         } catch (SQLException e) {
             System.err.println("Error al listar proveedores: " + e.getMessage());
+            LogService.error("Error al listar proveedores: ", e);
+            
         }
         return proveedores;
     }
@@ -57,6 +59,7 @@ public class ProveedorDAOImpl implements IProveedorDAO {
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
             System.err.println("Error al insertar proveedor: " + e.getMessage());
+            LogService.error("Error al insertar proveedor: ", e);
             return false;
         }
     }
@@ -78,6 +81,7 @@ public class ProveedorDAOImpl implements IProveedorDAO {
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
             System.err.println("Error al actualizar proveedor: " + e.getMessage());
+            LogService.error("Error al actualizar proveedor: ", e);
             return false;
         }
     }
@@ -92,6 +96,7 @@ public class ProveedorDAOImpl implements IProveedorDAO {
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
             System.err.println("Error al eliminar proveedor: " + e.getMessage());
+            LogService.error("Error al eliminar proveedor: ", e);
             if (e.getErrorCode() == 1451) { // Error de Foreign Key
                 JOptionPane.showMessageDialog(null, 
                     "No se puede eliminar. El proveedor tiene entradas registradas.",

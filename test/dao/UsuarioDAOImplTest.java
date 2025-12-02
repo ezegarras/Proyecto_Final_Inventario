@@ -5,14 +5,13 @@
 package dao;
 
 import modelo.Usuario;
-// --- IMPORTACIONES JUNIT 4 (OBLIGATORIAS) ---
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
 /**
- * Pruebas unitarias para el Login (Versión JUnit 4).
+ * Pruebas unitarias para el Login.
  */
 public class UsuarioDAOImplTest {
     
@@ -21,12 +20,12 @@ public class UsuarioDAOImplTest {
     public UsuarioDAOImplTest() {
     }
     
-    @Before // En JUnit 4 se usa @Before, no @BeforeEach
+    @Before 
     public void setUp() {
         instance = new UsuarioDAOImpl();
     }
     
-    @After // En JUnit 4 se usa @After, no @AfterEach
+    @After 
     public void tearDown() {
         instance = null;
     }
@@ -38,18 +37,15 @@ public class UsuarioDAOImplTest {
     public void testLoginExitoso() {
         System.out.println("Prueba: Login Exitoso");
         
-        // Asegúrate de que este usuario exista en tu BD
+     
         String usuario = "admin";
         String contrasena = "admin"; 
         
         Usuario result = instance.login(usuario, contrasena);
         
-        // VALIDACIONES (ASSERTS DE JUNIT 4)
         assertNotNull("El objeto usuario no debe ser null", result);
         assertEquals("El usuario debe ser admin", "admin", result.getUsuario());
         
-        // Nota: Verifica si en tu BD el rol se llama "Administrador" o "admin"
-        // assertEquals("El rol debe ser correcto", "Administrador", result.getRolNombre());
     }
 
     /**
@@ -64,7 +60,6 @@ public class UsuarioDAOImplTest {
         
         Usuario result = instance.login(usuario, contrasena);
         
-        // VALIDACIONES
         assertNull("El usuario debe ser null si la clave falla", result);
     }
     

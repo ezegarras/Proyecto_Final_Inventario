@@ -13,6 +13,7 @@ import java.util.List;
 import javax.swing.JOptionPane;
 import modelo.Producto;
 import utils.ConexionBD;
+import utils.LogService;
 
 /**
  *
@@ -24,10 +25,10 @@ public class ProductoDAOImpl implements IProductoDAO {
     @Override
     public List<Producto> listarParaCombos() {
         List<Producto> productos = new ArrayList<>();
-        // Traemos solo lo necesario para el combo de ventas
+      
         String sql = "SELECT id_producto, nombre, stock_actual, precio_unitario " +
                      "FROM Producto " +
-                     "WHERE stock_actual > 0 " + // Opcional: solo mostrar productos con stock
+                     "WHERE stock_actual > 0 " + 
                      "ORDER BY nombre ASC";
         
         try (Connection con = ConexionBD.getConexion();
@@ -43,7 +44,8 @@ public class ProductoDAOImpl implements IProductoDAO {
                 productos.add(p);
             }
         } catch (SQLException e) {
-            System.err.println("Error al listar productos para combos: " + e.getMessage());
+            //System.err.println("Error al listar productos para combos: " + e.getMessage());
+            LogService.error("Error al listar productos para combos: ", e);
         }
         return productos;
     }
@@ -88,7 +90,8 @@ public class ProductoDAOImpl implements IProductoDAO {
             }
         }
     } catch (SQLException e) {
-        System.err.println("Error al contar productos: " + e.getMessage());
+        //System.err.println("Error al contar productos: " + e.getMessage());
+        LogService.error("Error al contar productos: ", e);
     }
     return 0;
     }
@@ -122,7 +125,8 @@ public class ProductoDAOImpl implements IProductoDAO {
             return -1;
             
         } catch (SQLException e) {
-            System.err.println("Error al insertar producto: " + e.getMessage());
+            //System.err.println("Error al insertar producto: " + e.getMessage());
+            LogService.error("Error al insertar producto: ", e);
             return -1;
         }
     }
@@ -132,7 +136,6 @@ public List<Producto> listarProductos(String busqueda, boolean soloStockBajo, in
     List<Producto> productos = new ArrayList<>();
     int offset = (pagina - 1) * tamanoPagina;
 
-    // Construimos una consulta SQL dinámica
     StringBuilder sql = new StringBuilder(
         "SELECT p.*, c.nombre AS nombre_categoria " +
         "FROM Producto p " +
@@ -182,7 +185,8 @@ public List<Producto> listarProductos(String busqueda, boolean soloStockBajo, in
             }
         }
     } catch (SQLException e) {
-        System.err.println("Error al listar productos: " + e.getMessage());
+        //System.err.println("Error al listar productos: " + e.getMessage());
+        LogService.error("Error crítico al listar productos en la BD", e);
     }
     return productos;
 }
@@ -214,7 +218,8 @@ public List<Producto> listarProductos(String busqueda, boolean soloStockBajo, in
                 }
             }
         } catch (SQLException e) {
-            System.err.println("Error al buscar producto por ID: " + e.getMessage());
+            //System.err.println("Error al buscar producto por ID: " + e.getMessage());
+            LogService.error("Error al buscar producto por ID:", e);
         }
         return p;
     }
@@ -239,7 +244,8 @@ public List<Producto> listarProductos(String busqueda, boolean soloStockBajo, in
             return filasAfectadas > 0;
             
         } catch (SQLException e) {
-            System.err.println("Error al actualizar producto: " + e.getMessage());
+            //System.err.println("Error al actualizar producto: " + e.getMessage());
+            LogService.error("Error al actualizar producto:", e);
             return false;
         }
     }
@@ -257,7 +263,8 @@ public boolean eliminar(int idProducto) {
         return filasAfectadas > 0;
 
     } catch (SQLException e) {
-        System.err.println("Error al eliminar producto: " + e.getMessage());
+        //System.err.println("Error al eliminar producto: " + e.getMessage());
+        LogService.error("Error al eliminar producto: ", e);
         if (e.getErrorCode() == 1451) {
             javax.swing.JOptionPane.showMessageDialog(null, 
                 "No se puede eliminar el producto porque tiene ventas (salidas) registradas.",
@@ -293,7 +300,8 @@ public boolean eliminar(int idProducto) {
                 productos.add(p);
             }
         } catch (SQLException e) {
-            System.err.println("Error al listar productos con stock bajo: " + e.getMessage());
+            //System.err.println("Error al listar productos con stock bajo: " + e.getMessage());
+            LogService.error("Error al listar productos con stock bajo: ", e);
         }
         return productos;
     }

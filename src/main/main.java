@@ -41,7 +41,7 @@ public static void main(String[] args) {
     final DataUpdateNotifier notifier = new DataUpdateNotifier();
     
 
-    javax.swing.SwingUtilities.invokeLater(() -> {
+    javax.swing.SwingUtilities.invokeLater(() -> {d
 
         
         LoginWindow loginView = new LoginWindow();
